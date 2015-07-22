@@ -224,26 +224,26 @@ namespace Landis.Library.HarvestManagement
                 // to harvest the first time, it will automatically be harvested by the logic
                 // having to do with the setAside member variable (see AppliedRepeatHarvest.cs)
 
-                bool applyPrescription = false;
+                prescription.ApplyPrescription = false;
 
                 if (prescription.BeginTime <= Model.Core.CurrentTime &&
                     prescription.EndTime >= Model.Core.CurrentTime)
                 {
                     if (!(prescription is AppliedRepeatHarvest))
                     {
-                        applyPrescription = true;
+                        prescription.ApplyPrescription = true;
                     }
                     else if (prescription is AppliedRepeatHarvest &&
                         Model.Core.CurrentTime > 0 &&
                         !((AppliedRepeatHarvest)prescription).HasBeenHarvested)
                     {
-                        applyPrescription = true;
+                        prescription.ApplyPrescription = true;
                         ((AppliedRepeatHarvest)prescription).HasBeenHarvested = true;
                     }
                     
                 } // if(prescription.BeginTime <= Model.Core.CurrentTime...
 
-                if(applyPrescription)
+                if(prescription.ApplyPrescription)
                 {
                     //Model.Core.UI.WriteLine("   Applying Prescription: {0}  Model.Core.CurrentTime: {1}", prescription.Prescription.Name, Model.Core.CurrentTime);
                     

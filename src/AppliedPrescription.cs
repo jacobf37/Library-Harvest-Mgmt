@@ -36,6 +36,8 @@ namespace Landis.Library.HarvestManagement
 
         private static double currentRank;
 
+        private bool applyPrescription; //Track whether the prescription was applied during the current timestep
+
         //---------------------------------------------------------------------
 
         /// <summary>
@@ -348,5 +350,24 @@ namespace Landis.Library.HarvestManagement
                 return rankings;
             }
         }
+
+        //---------------------------------------------------------------------
+
+        /// <summary>
+        /// Indicates if the prescription was applied during the current timestep
+        ///</summary>
+        public bool ApplyPrescription
+        {
+            get
+            {
+                return this.applyPrescription;
+            }
+            set
+            {
+                this.applyPrescription = value;
+            }
+        }
+
+        //---------------------------------------------------------------------
     }
 }
