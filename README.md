@@ -2,4 +2,4 @@ This library is one of the [Harvest Libraries](https://github.com/LANDIS-II-Foun
 
 Changes to this extension are governed by the [**Repository Rules**](https://sites.google.com/site/landismodel/developers/developers-blog/repositoryrulesfromthetechnicaladvisorycommittee) from the Technical Advisory Committee.
 
-Eric Gustafson is the custodian of this extension.
+Eric Gustafson is the custodian of this library as it is the basis for the harvest extensions.
