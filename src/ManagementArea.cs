@@ -129,7 +129,8 @@ namespace Landis.Library.HarvestManagement
         /// Adds a prescription to be applied to the management area.
         /// </summary>
         public void ApplyPrescription(Prescription prescription,
-                                      Percentage   percentageToHarvest,
+                                      Percentage percentageToHarvest,
+                                      Percentage percentStandsToHarvest,
                                       int          startTime,
                                       int          endTime)
         {
@@ -143,18 +144,20 @@ namespace Landis.Library.HarvestManagement
             {
                 AppliedRepeatHarvest appy = new AppliedRepeatHarvest((SingleRepeatHarvest) prescription,
                     percentageToHarvest,
+                    percentStandsToHarvest,
                     startTime,
                     endTime);
                 prescriptions.Add(appy);
             }
             else if (prescription is RepeatHarvest)
             {
-                AppliedRepeatHarvest appy = new AppliedRepeatHarvest((RepeatHarvest)prescription, percentageToHarvest, startTime, endTime);
+                AppliedRepeatHarvest appy = new AppliedRepeatHarvest((RepeatHarvest)prescription, percentageToHarvest, percentStandsToHarvest, startTime, endTime);
                 prescriptions.Add(appy);
             }
             else
                 prescriptions.Add(new AppliedPrescription(prescription,
                                                       percentageToHarvest,
+                                                      percentStandsToHarvest,
                                                       startTime,
                                                       endTime));
         }
@@ -189,6 +192,10 @@ namespace Landis.Library.HarvestManagement
             //  its stands.
             area = 0;
             foreach (Stand stand in stands) {
+                // Initialize stands for harvesting to compile ActiveArea and SiteLocations
+                // 05-AUG-2015 the next call causes an Object reference not set exception
+                // when the stand object tries to access SiteVars.LandUseAllowHarvest[site] on line 463
+                stand.InitializeForHarvesting();
                 area += stand.ActiveArea;
                 stand.TimeLastHarvested = -1 * stand.ComputeAge();
 

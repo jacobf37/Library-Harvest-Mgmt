@@ -84,6 +84,7 @@
     <Compile Include="stand-ranking\MaximumAge.cs" />
     <Compile Include="stand-ranking\MinimumAge.cs" />
     <Compile Include="stand-ranking\MinTimeSinceLastHarvest.cs" />
+    <Compile Include="stand-ranking\Presalvage.cs" />
     <Compile Include="stand-ranking\RandomRank.cs" />
     <Compile Include="stand-ranking\RegulateAgesRank.cs" />
     <Compile Include="stand-ranking\SpatialArrangement.cs" />
