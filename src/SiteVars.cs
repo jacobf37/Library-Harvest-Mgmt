@@ -96,6 +96,8 @@ namespace Landis.Library.HarvestManagement
 
             SiteVars.TimeOfLastEvent.ActiveSiteValues = -100;
             SiteVars.Prescription.SiteValues = null;
+
+            GetExternalVars();
         }
 
         //---------------------------------------------------------------------
