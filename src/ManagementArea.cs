@@ -6,6 +6,7 @@
 using Edu.Wisc.Forest.Flel.Util;
 using System.Collections.Generic;
 using System.Reflection;
+using System;
 
 using log4net;
 
@@ -302,7 +303,7 @@ namespace Landis.Library.HarvestManagement
                 double ratioTotal = 0.0;
                 
                 foreach (AppliedPrescription prescription in activePrescriptions) {
-                    ratioTotal += prescription.AreaRemainingRatio;
+                    ratioTotal += Math.Min(prescription.AreaRemainingRatio, prescription.StandsRemainingRatio);
                 }
                 
                 if (ratioTotal > 0) {
@@ -310,7 +311,7 @@ namespace Landis.Library.HarvestManagement
                         AppliedPrescription prescription = activePrescriptions[i];
                         //first prescription, start at 0
                         if (i == 0) {
-                            endProbability[i] = prescription.AreaRemainingRatio / ratioTotal;
+                            endProbability[i] = Math.Min(prescription.AreaRemainingRatio, prescription.StandsRemainingRatio) / ratioTotal;
                         }
 
                         //last prescription, end at 1.0                    
@@ -321,7 +322,7 @@ namespace Landis.Library.HarvestManagement
                         //
                         else {
                             double startProbability = endProbability[i - 1];
-                            double intervalWidth = prescription.AreaRemainingRatio / ratioTotal;
+                            double intervalWidth = Math.Min(prescription.AreaRemainingRatio, prescription.StandsRemainingRatio) / ratioTotal;
                             endProbability[i] = startProbability + intervalWidth;
 
                         }
