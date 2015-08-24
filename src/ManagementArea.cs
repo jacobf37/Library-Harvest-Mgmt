@@ -194,8 +194,6 @@ namespace Landis.Library.HarvestManagement
             area = 0;
             foreach (Stand stand in stands) {
                 // Initialize stands for harvesting to compile ActiveArea and SiteLocations
-                // 05-AUG-2015 the next call causes an Object reference not set exception
-                // when the stand object tries to access SiteVars.LandUseAllowHarvest[site] on line 463
                 stand.InitializeForHarvesting();
                 area += stand.ActiveArea;
                 stand.TimeLastHarvested = -1 * stand.ComputeAge();
