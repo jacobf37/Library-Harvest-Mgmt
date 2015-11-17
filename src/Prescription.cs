@@ -240,13 +240,14 @@ namespace Landis.Library.HarvestManagement
                     SiteVars.CohortsDamaged[site] = cohortCounts.AllSpecies;
                     standForCurrentSite.DamageTable.IncrementCounts(cohortCounts);
                     stand.LastAreaHarvested += Model.Core.CellArea;
-                    SiteVars.Prescription[site] = this;
                     if (isDebugEnabled)
                         log.DebugFormat("    # of cohorts damaged = {0}; stand.LastAreaHarvested = {1}",
                                         SiteVars.CohortsDamaged[site],
                                         stand.LastAreaHarvested);
                     HarvestExtensionMain.OnSiteHarvest(this, site);
                 }
+                // Always record the prescription even if nothing harvested; Supports plantOnly prescriptions
+                SiteVars.Prescription[site] = this;
 
                 if (speciesToPlant != null)
                     Reproduction.ScheduleForPlanting(speciesToPlant, site);
