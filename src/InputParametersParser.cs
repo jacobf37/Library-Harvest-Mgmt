@@ -377,6 +377,7 @@ namespace Landis.Library.HarvestManagement
                 ushort adjacency = standAdjacency.Value.Actual;
                 ReadVar(adjacencyType);
 
+                if (adjacencyType.Value.String != "StandAge" && adjacencyType.Value.String != "TimeSinceLastHarvested") {
                     string[] methodList = new string[]{"AdjacencyType methods:",
                                                        "    StandAge",
                                                        "    TimeSinceLastHarvested"};
