@@ -35,6 +35,7 @@ namespace Landis.Library.HarvestManagement
             public const string MinimumAge = "MinimumAge";
             public const string spatialArrangement = "SpatialArrangement";
             public const string minimumTimeSinceLastHarvest = "MinimumTimeSinceLastHarvest";
+
             public const string PreventEstablishment = ParameterNames.PreventEstablishment;
             public const string MultipleRepeat = "MultipleRepeat";
             public const string MinTimeSinceDamage = "MinTimeSinceDamage";
@@ -376,7 +377,7 @@ namespace Landis.Library.HarvestManagement
                 ushort adjacency = standAdjacency.Value.Actual;
                 ReadVar(adjacencyType);
 
-                if (adjacencyType.Value.String != "StandAge" && adjacencyType.Value.String != "MinimumTimeSinceLastHarvest") {
+                if (adjacencyType.Value.String != "StandAge" && adjacencyType.Value.String != "TimeSinceLastHarvested") {
                     string[] methodList = new string[]{"AdjacencyType methods:",
                                                        "    StandAge",
                                                        "    TimeSinceLastHarvested"};
