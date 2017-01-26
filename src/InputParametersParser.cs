@@ -35,6 +35,8 @@ namespace Landis.Library.HarvestManagement
             public const string MinimumAge = "MinimumAge";
             public const string spatialArrangement = "SpatialArrangement";
             public const string minimumTimeSinceLastHarvest = "MinimumTimeSinceLastHarvest";
+            public const string timeSinceLastFire = "TimeSinceLastFire";
+            public const string timeSinceLastWind = "TimeSinceLastWind";
 
             public const string PreventEstablishment = ParameterNames.PreventEstablishment;
             public const string MultipleRepeat = "MultipleRepeat";
@@ -302,6 +304,8 @@ namespace Landis.Library.HarvestManagement
 
             InputVar<string> rankingName = new InputVar<string>("StandRanking");
             ReadVar(rankingName);
+            bool check = false;
+            bool reqs = false;
 
             IStandRankingMethod rankingMethod;
 
@@ -315,6 +319,11 @@ namespace Landis.Library.HarvestManagement
                 rankingMethod = new RegulateAgesRank();
             else if (rankingName.Value.Actual == "FireHazard")
                 rankingMethod = new FireRiskRank(ReadFireRiskTable());
+            else if (rankingName.Value.Actual == "TimeSinceDisturbance")
+            {
+                rankingMethod = new TimeSinceDisturbanceRank();
+                check = true;
+            }
 
             ////list of ranking methods which have not been implemented yet
             //else if ((rankingName.Value.Actual == "SpeciesBiomass") ||
@@ -323,13 +332,15 @@ namespace Landis.Library.HarvestManagement
             //                                  rankingName.Value.String + " is not implemented yet");
             //}
 
-            else {
+            else
+            {
                 string[] methodList = new string[]{"Stand ranking methods:",
                                                    "  Economic",
                                                    "  MaxCohortAge",
                                                    "  Random",
                                                    "  RegulateAges",
-                                                   "  FireRisk"};
+                                                   "  FireRisk",
+                                                   "  TimeSinceDisturbance"};
                 throw new InputValueException(rankingName.Value.String,
                                               rankingName.Value.String + " is not a valid stand ranking",
                                               new MultiLineText(methodList));
@@ -365,6 +376,26 @@ namespace Landis.Library.HarvestManagement
                                                   minimumAge.Value.String);
                 //add the maximumAge ranking requirement to this ranking method.
                 rankingMethod.AddRequirement(new MaximumAge(maxAge));
+            }
+
+            InputVar<ushort> firetime = new InputVar<ushort>("TimeSinceLastFire");
+            if (ReadOptionalVar(firetime))
+            {
+                reqs = true;
+                //get the firetime
+                ushort fire = firetime.Value.Actual;
+                //add the firetime ranking requirement to this ranking method.
+                rankingMethod.AddRequirement(new TimeSinceLastFire(fire));
+            }
+
+            InputVar<ushort> windtime = new InputVar<ushort>("TimeSinceLastWind");
+            if (ReadOptionalVar(windtime))
+            {
+                reqs = true;
+                //get the windtime
+                ushort wind = windtime.Value.Actual;
+                //add the windtime ranking requirement to this ranking method.
+                rankingMethod.AddRequirement(new TimeSinceLastWind(wind));
             }
 
             //stand adjacency variables and constraints
@@ -415,6 +446,11 @@ namespace Landis.Library.HarvestManagement
                 rankingMethod.AddRequirement(new MinTimeSinceLastHarvest(min_time));
             }
 
+            if(check == true && reqs == false)
+            {
+                throw NewParseException("TimeSinceLastFire or TimeSinceLastWind is required when ranking with TimeSinceDisturbance.");
+            }
+
             return rankingMethod;
         }
 
@@ -429,7 +465,9 @@ namespace Landis.Library.HarvestManagement
                 Names.ForestTypeTable,
                 Names.minimumTimeSinceLastHarvest,
                 Names.MinTimeSinceDamage,
-                Names.StandAdjacency
+                Names.StandAdjacency,
+                Names.timeSinceLastFire,
+                Names.timeSinceLastWind
 
             }
         );
