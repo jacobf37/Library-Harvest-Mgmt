@@ -1,0 +1,10 @@
+C:\Users\bmarr\Desktop\New_folder4\Library-Harvest-Mgmt\src\obj\Debug\harvest-mgmt-lib.csprojResolveAssemblyReference.cache
+C:\Users\bmarr\Desktop\New_folder4\Library-Harvest-Mgmt\src\bin\Debug\Landis.Library.HarvestManagement-v2.xml
+C:\Users\bmarr\Desktop\New_folder4\Library-Harvest-Mgmt\src\bin\Debug\Landis.Library.HarvestManagement-v2.dll
+C:\Users\bmarr\Desktop\New_folder4\Library-Harvest-Mgmt\src\bin\Debug\Landis.Library.HarvestManagement-v2.pdb
+C:\Users\bmarr\Desktop\New_folder4\Library-Harvest-Mgmt\src\bin\Debug\Landis.Library.AgeOnlyCohorts.dll
+C:\Users\bmarr\Desktop\New_folder4\Library-Harvest-Mgmt\src\bin\Debug\Landis.Library.Cohorts.dll
+C:\Users\bmarr\Desktop\New_folder4\Library-Harvest-Mgmt\src\bin\Debug\Landis.Library.Succession.dll
+C:\Users\bmarr\Desktop\New_folder4\Library-Harvest-Mgmt\src\bin\Debug\Troschuetz.Random.dll
+C:\Users\bmarr\Desktop\New_folder4\Library-Harvest-Mgmt\src\obj\Debug\Landis.Library.HarvestManagement-v2.dll
+C:\Users\bmarr\Desktop\New_folder4\Library-Harvest-Mgmt\src\obj\Debug\Landis.Library.HarvestManagement-v2.pdb
