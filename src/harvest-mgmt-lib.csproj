@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Landis.Library.HarvestManagement</RootNamespace>
-    <AssemblyName>Landis.Library.HarvestManagement-v1</AssemblyName>
+    <AssemblyName>Landis.Library.HarvestManagement-v2</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -22,7 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Landis.Library.HarvestManagement-v1.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Landis.Library.HarvestManagement-v2.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,7 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Landis.Library.HarvestManagement-v1.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Landis.Library.HarvestManagement-v2.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -91,6 +91,9 @@
     <Compile Include="stand-ranking\StandAdjacency.cs" />
     <Compile Include="stand-ranking\StandRanking.cs" />
     <Compile Include="stand-ranking\StandRankingMethod.cs" />
+    <Compile Include="stand-ranking\TimeSinceDisturbanceRank.cs" />
+    <Compile Include="stand-ranking\TimeSinceLastFire.cs" />
+    <Compile Include="stand-ranking\TimeSinceLastWind.cs" />
     <Compile Include="Stand.cs" />
     <Compile Include="Stands.cs" />
     <Compile Include="UIntPixel.cs" />
@@ -128,7 +131,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(LANDIS_SDK)\staging\copy-to-build-dir.cmd" "$(ProjectDir)staging-list.txt" $(OutDir)</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>call $(SolutionDir)\install-libs.cmd</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
