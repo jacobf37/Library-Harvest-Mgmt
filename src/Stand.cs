@@ -1,7 +1,4 @@
 // This file is part of the Harvest Management library for LANDIS-II.
-// For copyright and licensing information, see the NOTICE and LICENSE
-// files in this project's top-level directory, and at:
-//   http://landis-extensions.googlecode.com/svn/libs/harvest-mgmt/trunk/
 
 using Edu.Wisc.Forest.Flel.Util;
 using Landis.Library.SiteHarvest;
@@ -72,7 +69,7 @@ namespace Landis.Library.HarvestManagement
 
         //---------------------------------------------------------------------
 
-        /// <summar>
+        /// <summary>
         /// The list of locations in this stand where a site's land use allows
         /// harvesting at the current timestep.
         /// </summary>
