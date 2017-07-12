@@ -97,8 +97,7 @@ namespace Landis.Library.HarvestManagement
         /// </summary>
         public void SetAsideForSingleHarvest(Stand stand)
         {
-            stand.SetAsideUntil(Math.Min(Model.Core.CurrentTime + repeatHarvest.Interval,
-                                         EndTime));
+            stand.SetAsideUntil(Model.Core.CurrentTime + repeatHarvest.Interval);
         }
 
         //---------------------------------------------------------------------
@@ -118,10 +117,8 @@ namespace Landis.Library.HarvestManagement
         /// during the current timestep.
         /// </summary>
         public override void HarvestHighestRankedStand()
-        {
-        
+        {        
             base.HarvestHighestRankedStand();
-
 
             foreach (Stand stand in repeatHarvest.HarvestedStands)
             {

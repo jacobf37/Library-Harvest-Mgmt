@@ -232,7 +232,7 @@ namespace Landis.Library.HarvestManagement
                 if (prescription.BeginTime <= Model.Core.CurrentTime &&
                     prescription.EndTime >= Model.Core.CurrentTime)
                 {
-                    if (!(prescription is AppliedRepeatHarvest))
+                    if (!(prescription is AppliedRepeatHarvest) || prescription.Prescription is SingleRepeatHarvest)
                     {
                         prescription.ApplyPrescription = true;
                     }
@@ -249,12 +249,12 @@ namespace Landis.Library.HarvestManagement
                 if(prescription.ApplyPrescription)
                 {
                     //Model.Core.UI.WriteLine("   Applying Prescription: {0}  Model.Core.CurrentTime: {1}", prescription.Prescription.Name, Model.Core.CurrentTime);
-                    
+
                     if (isDebugEnabled)
                         log.DebugFormat("  Initializing prescription {0} ...", prescription.Prescription.Name);
-                        
+
                     //Model.Core.UI.WriteLine("   Initializing prescription {0} ...", prescription.Prescription.Name);
-                    
+
                     //set harvesting areas, rank stands (by user choice method)
                     prescription.InitializeForHarvest(stands);
                     
@@ -276,7 +276,7 @@ namespace Landis.Library.HarvestManagement
 
             foreach (AppliedPrescription prescription in prescriptions) {
                 //Model.Core.UI.WriteLine("      Looping through prescriptions... {0}.", prescription.Prescription.Name);
-            
+
                 if (prescription is AppliedRepeatHarvest) 
                 {
                     //prescription.Prescription.SiteSelectionMethod = new CompleteStand();
@@ -337,8 +337,14 @@ namespace Landis.Library.HarvestManagement
                     }
                     
                     //actually harvest the stands: starting with highest ranked
-
-                    selectedPrescription.HarvestHighestRankedStand();
+                    if(selectedPrescription is AppliedRepeatHarvest)
+                    {
+                        ((AppliedRepeatHarvest)selectedPrescription).HarvestHighestRankedStand();
+                    }
+                    else
+                    {
+                        selectedPrescription.HarvestHighestRankedStand();
+                    }
                     
                     //Model.Core.UI.WriteLine("\nSELECTED PRESCRIPTION = {0}\n", selectedPrescription.Prescription.Name);
                     
@@ -380,7 +386,7 @@ namespace Landis.Library.HarvestManagement
                     else {
                         //Model.Core.UI.WriteLine("returned a null stand");
                     }
-                    
+
                     //  Check each prescription to see if there's at least one  unharvested stand that the prescription ranks higher than  0.  
                     // The list is traversed in reverse order, so that the removal of items doesn't mess up the traversal.
                     for (int i = activePrescriptions.Count - 1; i >= 0; --i) {
@@ -389,8 +395,8 @@ namespace Landis.Library.HarvestManagement
                             activePrescriptions.RemoveAt(i);
                         }
                     }
-                    
                 }
+
                 else {
                     for (int i = activePrescriptions.Count - 1; i >= 0; --i) {
                         //Model.Core.UI.WriteLine("removing2 {0}", activePrescriptions[i].Prescription.Name);
