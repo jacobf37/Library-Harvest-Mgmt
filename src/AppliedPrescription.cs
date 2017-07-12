@@ -319,7 +319,6 @@ namespace Landis.Library.HarvestManagement
         /// </remarks>
         public void InitializeForHarvest(List<Stand> stands)
         {
-            
             areaRemainingToHarvest = areaToHarvest;
             
             areaRemainingRatio = 1.0;
