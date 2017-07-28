@@ -249,7 +249,7 @@ namespace Landis.Library.HarvestManagement
                                                           repeatParamLineNumber,
                                                           harvestTimestep);
                     ICohortSelector additionalCohortSelector = ReadCohortSelector(true);
-                    ICohortCutter additionalCohortCutter = CreateCohortCutter(additionalCohortSelector);
+                    ICohortCutter additionalCohortCutter = CreateAdditionalCohortCutter(additionalCohortSelector);
                     Planting.SpeciesList additionalSpeciesToPlant = ReadSpeciesToPlant();
                     ISiteSelector additionalSiteSelector = new CompleteStand();
                     prescriptions.Add(new SingleRepeatHarvest(name,
@@ -807,6 +807,20 @@ namespace Landis.Library.HarvestManagement
         /// WholeCohortCutter.
         /// </remarks>
         protected virtual ICohortCutter CreateCohortCutter(ICohortSelector cohortSelector)
+        {
+            return new WholeCohortCutter(cohortSelector, HarvestExtensionMain.ExtType);
+        }
+
+        /// <summary>
+        /// Creates a new cohort cutter for a cohort selector.
+        /// </summary>
+        /// <remarks>
+        /// By default, this method creates a WholeCohortCutter instance.  But
+        /// the parser class for Biomass Harvest extension overrides this method
+        /// so it can determine whether to create a PartialCohortCutter or a
+        /// WholeCohortCutter.
+        /// </remarks>
+        protected virtual ICohortCutter CreateAdditionalCohortCutter(ICohortSelector cohortSelector)
         {
             return new WholeCohortCutter(cohortSelector, HarvestExtensionMain.ExtType);
         }
