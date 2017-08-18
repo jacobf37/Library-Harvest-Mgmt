@@ -27,7 +27,7 @@ namespace Landis.Library.HarvestManagement
         protected override double ComputeRank(Stand stand, int i)
         {
 
-            SiteVars.ReInitialize();
+            SiteVars.GetExternalVars();
             //if (SiteVars.CFSFuelType == null)
             //    throw new System.ApplicationException("Error: CFS Fuel Type NOT Initialized.  Fuel extension MUST be active.");
 
