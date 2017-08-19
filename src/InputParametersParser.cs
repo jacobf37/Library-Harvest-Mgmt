@@ -985,17 +985,16 @@ namespace Landis.Library.HarvestManagement
                                                                         beginTimeVar.Value.String));
                         if (endTime > scenarioEnd)
                         {
-                                throw new InputValueException(endTimeVar.Value.String,
-                                                              string.Format("Year {0} is after the scenario' end year ({1})",
-                                                                            endTimeVar.Value.String,
-                                                                            scenarioEnd));
-
                             string line1 = string.Format("   NOTE: End Year {0} is after the scenario' end year {1}", endTimeVar.Value.String, scenarioEnd);
                             string line2 = string.Format("         on line {0} of the harvest input file...", LineNumber);
                             List<string> noteList = new List<string>();
                             noteList.Add(line1);
                             noteList.Add(line2);
                             parserNotes.Add(noteList);
+                            throw new InputValueException(endTimeVar.Value.String,
+                                                              string.Format("Year {0} is after the scenario' end year ({1})",
+                                                                            endTimeVar.Value.String,
+                                                                            scenarioEnd));  
                         }
 
                         CheckNoDataAfter("the " + endTimeVar.Name + " column",

@@ -129,7 +129,7 @@ namespace Landis.Library.HarvestManagement
         /// </remarks>
         public static void GetExternalVars()
         {
-            TimeOfLastFire = Model.Core.GetSiteVar<int>("Fire.TimeOfLastEvent");
+            TimeOfLastFire = Model.Core.GetSiteVar<int>("Fire.TimeOfLastFire");
             TimeOfLastWind = Model.Core.GetSiteVar<int>("Wind.TimeOfLastEvent");
             CFSFuelType = Model.Core.GetSiteVar<int>("Fuels.CFSFuelType");
             NextBDA = Model.Core.GetSiteVar<int>("BDA.TimeOfNext");
