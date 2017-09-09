@@ -105,6 +105,8 @@ namespace Landis.Library.HarvestManagement
             //bool meets = false;
             int numCellsValid = 0;
             int numActiveCells = 0;
+            bool goodSite = false;
+            bool otherSpecies = false;
             
             int[] numCellsOtherSpecies = new int[Model.Core.Species.Count];
             
@@ -114,8 +116,6 @@ namespace Landis.Library.HarvestManagement
                 //    continue;
 
                 numActiveCells++;
-                    
-                bool goodSite = false;
                 //bool otherSpecies = false;
                     
                 //Landis.Library.BaseCohorts.ISiteCohorts siteCohorts = (Landis.Library.BaseCohorts.ISiteCohorts) Model.Core.SuccessionCohorts[site];
@@ -134,17 +134,21 @@ namespace Landis.Library.HarvestManagement
                             // Some other species, NOT in the list
                             if (!rule.SpeciesList.Contains(species.Name) && rule.RuleAgeRange.Contains(cohort.Age))   
                             {
-                                //otherSpecies = true;
-                                numCellsOtherSpecies[species.Index]++;
+                                otherSpecies = true;
                             }
                         }
-                    
+                    }
+                    if(otherSpecies)
+                    {
+                        numCellsOtherSpecies[species.Index]++;
+                        otherSpecies = false;
                     }
                 }
-                
-                if(goodSite) 
+                if(goodSite)
+                {
                     numCellsValid++;
-
+                    goodSite = false;
+                }
                 //if(otherSpecies)
                 //numCellsOtherSpecies[species.Index]++;
 
@@ -174,13 +178,12 @@ namespace Landis.Library.HarvestManagement
             }
             
             //If percent == -1, use 'highest' evaluation algorithm
-            else 
-            {
-                    
+            else
+            {   
                 for(int i = 0; i < Model.Core.Species.Count; i++)
                 {
-                    if(numCellsValid < numCellsOtherSpecies[i])
-                        highest = false;
+                    if (numCellsValid < numCellsOtherSpecies[i])
+                        return false;
                     //Model.Core.UI.WriteLine("       numGoodSites={0}, otherSppCnt={1}, true? {2}", numCellsValid, otherSpeciesCount[i], highest);
                 }
             }
