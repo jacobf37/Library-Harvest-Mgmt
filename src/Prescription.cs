@@ -222,6 +222,11 @@ namespace Landis.Library.HarvestManagement
                 // Site selection may have spread to other stands beyond the
                 // original stand.
                 Stand standForCurrentSite = SiteVars.Stand[site];
+                
+                // Always record the prescription even if nothing harvested; Supports plantOnly prescriptions
+                SiteVars.Prescription[site] = this;
+                SiteVars.PrescriptionName[site] = this.Name;
+
 
                 if (isDebugEnabled)
                     log.DebugFormat("  Cutting cohorts at {0} in stand {1}{2}", site,
@@ -243,11 +248,14 @@ namespace Landis.Library.HarvestManagement
                                         stand.LastAreaHarvested);
                     HarvestExtensionMain.OnSiteHarvest(this, site);
                 }
-                // Always record the prescription even if nothing harvested; Supports plantOnly prescriptions
-                SiteVars.Prescription[site] = this;
+                
 
                 if (speciesToPlant != null)
+                {
+
+                    Model.Core.UI.WriteLine("  {0} {1}",speciesToPlant.ToString(), site.ToString());
                     Reproduction.ScheduleForPlanting(speciesToPlant, site);
+                }
             
             } 
             return; 

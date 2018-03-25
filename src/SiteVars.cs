@@ -88,6 +88,7 @@ namespace Landis.Library.HarvestManagement
             TimeOfLastEvent  = Model.Core.Landscape.NewSiteVar<int>();
 
             Model.Core.RegisterSiteVar(SiteVars.PrescriptionName, "Harvest.PrescriptionName");
+            //Model.Core.RegisterSiteVar(SiteVars.Prescription, "Harvest.PrescriptionName");
             Model.Core.RegisterSiteVar(SiteVars.TimeOfLastEvent, "Harvest.TimeOfLastEvent");
             Model.Core.RegisterSiteVar(SiteVars.CohortsDamaged, "Harvest.CohortsDamaged");
 
