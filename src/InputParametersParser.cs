@@ -1,6 +1,6 @@
 // This file is part of the Harvest Management library for LANDIS-II.
 
-using Edu.Wisc.Forest.Flel.Util;
+using Landis.Utilities;
 using Landis.Core;
 using Landis.Library.SiteHarvest;
 using Landis.Library.Succession;
@@ -90,7 +90,7 @@ namespace Landis.Library.HarvestManagement
         static InputParametersParser()
         {
             // FIXME: Hack to ensure that Percentage is registered with InputValues
-            Edu.Wisc.Forest.Flel.Util.Percentage p = new Edu.Wisc.Forest.Flel.Util.Percentage();
+            Landis.Utilities.Percentage p = new Landis.Utilities.Percentage();
         }
 
         //---------------------------------------------------------------------
