@@ -12,7 +12,7 @@
     <PackageLicenseUrl>https://github.com/LANDIS-II-Foundation/Library-Harvest-Mgmt/blob/master/LICENSE</PackageLicenseUrl>
     <Product>Harvest Library</Product>
     <Description>Harvest Library for LANDIS-II</Description>
-    <Copyright>Apache License 2.0</Copyright>
+    <Copyright></Copyright>
     <RepositoryUrl>https://github.com/LANDIS-II-Foundation/Library-Harvest-Mgmt</RepositoryUrl>
     <PackageProjectUrl>https://sites.google.com/site/landismodel/home</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
