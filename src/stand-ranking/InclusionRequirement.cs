@@ -3,7 +3,7 @@
 using Landis.Core;
 using Landis.Library.AgeOnlyCohorts;
 using Landis.SpatialModeling;
-using Edu.Wisc.Forest.Flel.Util;
+using Landis.Utilities;
 using System;
 using System.Collections.Generic;
 

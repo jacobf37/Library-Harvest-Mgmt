@@ -1,7 +1,7 @@
 // This file is part of the Harvest Management library for LANDIS-II.
 
 using System.Collections.Generic;
-using Edu.Wisc.Forest.Flel.Util;
+using Landis.Utilities;
 
 namespace Landis.Library.HarvestManagement
 {
