@@ -1,7 +1,9 @@
 ﻿// This file is part of the Harvest Management library for LANDIS-II.
 
 using Landis.Core;
-using Landis.Library.AgeOnlyCohorts;
+//using Landis.Library.AgeOnlyCohorts;
+using Landis.Library.BiomassCohorts;
+using Landis.Library.Biomass;
 using Landis.SpatialModeling;
 
 namespace Landis.Library.HarvestManagement
@@ -78,7 +80,9 @@ namespace Landis.Library.HarvestManagement
         /// </summary>
         public static void Initialize()
         {
-            Cohorts = Model.Core.GetSiteVar<ISiteCohorts>("Succession.AgeCohorts");
+            //Cohorts = Model.Core.GetSiteVar<ISiteCohorts>("Succession.AgeCohorts");
+
+            Cohorts = Model.Core.GetSiteVar<Landis.Library.BiomassCohorts.ISiteCohorts>("Succession.BiomassCohorts");
 
             ManagementArea   = Model.Core.Landscape.NewSiteVar<ManagementArea>();
             Stand            = Model.Core.Landscape.NewSiteVar<Stand>();
