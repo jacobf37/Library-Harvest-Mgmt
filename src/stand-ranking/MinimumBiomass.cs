@@ -47,10 +47,16 @@ namespace Landis.Library.HarvestManagement
         double CohortTotal(ActiveSite site)
         {
             double agb = 0.0;
-            foreach(ICohort cohort in SiteVars.Cohorts[site])
+            foreach (ISpeciesCohorts speciesCohorts in SiteVars.Cohorts[site])
             {
-                agb += cohort.Biomass;
+                foreach (ICohort cohort in speciesCohorts)
+                {
+                    agb += cohort.Biomass;
+                }
             }
+            //foreach (ICohort cohort in SiteVars.Cohorts[site])
+            //    agb += cohort.Biomass;
+
             return agb;
         }
     }
