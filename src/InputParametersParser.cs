@@ -47,6 +47,7 @@ namespace Landis.Library.HarvestManagement
             public const string ForestTypeTable = "ForestTypeTable";
             public const string StandAdjacency = "StandAdjacency";
             public const string PresalvageYears = "PresalvageYears";
+            public const string MinimumBiomass = "MinimumBiomass";
         }
 
         //---------------------------------------------------------------------
@@ -472,7 +473,8 @@ namespace Landis.Library.HarvestManagement
                 Names.MinTimeSinceDamage,
                 Names.StandAdjacency,
                 Names.timeSinceLastFire,
-                Names.timeSinceLastWind
+                Names.timeSinceLastWind,
+                Names.MinimumBiomass
 
             }
         );
