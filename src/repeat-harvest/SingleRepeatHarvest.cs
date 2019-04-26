@@ -2,6 +2,7 @@
 
 using Landis.Library.SiteHarvest;
 using Landis.Library.Succession;
+using Landis.SpatialModeling;
 
 namespace Landis.Library.HarvestManagement
 {
@@ -63,13 +64,30 @@ namespace Landis.Library.HarvestManagement
                 //
                 //if(this.SiteSelectionMethod.GetType() == Landis.Extension.BiomassHarvest.PartialStandSpreading)
                 //  SiteSelector = BiomassHarvest.WrapSiteSelector(SiteSelector);
-                
+                this.IsSingleRepeatStep = true;
             }
             else {
                 CohortCutter = initialCohortSelector;
                 SpeciesToPlant = initialSpeciesToPlant;
             }
             base.Harvest(stand);
+
+            if (stand.IsSetAside)
+            {
+                foreach (ActiveSite site in SiteSelector.SelectSites(stand))
+                {
+                    // Unmark the sites here
+                }
+                this.IsSingleRepeatStep = false;
+            }
+            else
+            {
+                // Ensure that the sites being harvested are the exact ones to be harvested later
+                foreach (ActiveSite site in SiteSelector.SelectSites(stand))
+                {
+                    // Mark the sites here
+                }
+            }
 
             return; 
         }
