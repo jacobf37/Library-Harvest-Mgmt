@@ -28,6 +28,7 @@ namespace Landis.Library.HarvestManagement
         private bool preventEstablishment;
         private CohortCounts cohortCounts;
         private bool isSingleRepeatStep;
+        protected bool isSingleRepeatPrescription;
         
         //---------------------------------------------------------------------
 
@@ -203,6 +204,7 @@ namespace Landis.Library.HarvestManagement
             this.minTimeSinceDamage = minTimeSinceDamage;
             this.preventEstablishment = preventEstablishment;
             this.isSingleRepeatStep = false;
+            this.isSingleRepeatPrescription = false;
 
             cohortCounts = new CohortCounts();
         }
@@ -239,11 +241,10 @@ namespace Landis.Library.HarvestManagement
             
             if (isSingleRepeatStep)
             {
-                // This will have to iterate through a different collection of sites, namely the ones set aside earlier
-                foreach (ActiveSite site in SiteSelector.SelectSites(stand))
+                foreach (ActiveSite site in stand)
                 {
                     // Check if this was previously harvested in the last step
-                    if (true)
+                    if (stand.IsSiteSetAside(site, this.Name))
                     {
                         HarvestSite(site, stand);
                     }
@@ -254,6 +255,11 @@ namespace Landis.Library.HarvestManagement
                 foreach (ActiveSite site in SiteSelector.SelectSites(stand))
                 {
                     HarvestSite(site, stand);
+
+                    if (this.isSingleRepeatPrescription)
+                    {
+                        stand.SetSiteAside(site, this.Name);
+                    }
                 }
             }
             return; 

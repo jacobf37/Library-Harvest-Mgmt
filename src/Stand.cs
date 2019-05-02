@@ -33,6 +33,7 @@ namespace Landis.Library.HarvestManagement
         private double rank;  // for log
         //harvested_rank, used in log
         private double harvested_rank; // for log
+        private Dictionary<string, List<Location>> setAsideSites; // List of all sites that should be harvested again in SingleRepeat, seperated by prescription
 
         // tjs 2009.02.07 - Set by prescription to prevent recently
         // damaged sites from being harvested
@@ -66,6 +67,55 @@ namespace Landis.Library.HarvestManagement
         /// All the site locations in the stand, as specified in the stand map.
         /// </summary>
         public List<Location> AllLocations { get; private set; }
+
+        /// <summary>
+        /// Determines if a given active site has been set aside for single repeat
+        /// </summary>
+        public bool IsSiteSetAside(ActiveSite site, string name)
+        {
+            if (this.setAsideSites == null || !this.setAsideSites.ContainsKey(name) || this.setAsideSites[name].Count == 0)
+            {
+                return false;
+            }
+
+            return this.setAsideSites[name].Contains(site.Location);
+        }
+
+        /// <summary>
+        /// Adds a site to the list of set aside sites for single repeat
+        /// </summary>
+        public void SetSiteAside(ActiveSite site, string name)
+        {
+            if (!this.setAsideSites.ContainsKey(name))
+            {
+                this.setAsideSites.Add(name, new List<Location>());
+            }
+            this.setAsideSites[name].Add(site.Location);
+        }
+
+        /// <summary>
+        /// Removes a single site from the set aside list
+        /// </summary>
+        public void RemoveSetAsideSite(ActiveSite site, string name)
+        {
+            if (!this.setAsideSites.ContainsKey(name))
+            {
+                return;
+            }
+            this.setAsideSites[name].Remove(site.Location);
+        }
+
+        /// <summary>
+        /// Removes all sites from the set aside list
+        /// </summary>
+        public void ClearSetAsideSites(string name)
+        {
+            if (!this.setAsideSites.ContainsKey(name))
+            {
+                return;
+            }
+            this.setAsideSites[name].Clear();
+        }
 
         //---------------------------------------------------------------------
 
@@ -342,6 +392,7 @@ namespace Landis.Library.HarvestManagement
             this.timeLastHarvested = -1;
             this.DamageTable = new CohortCounts();
             this.rejectedPrescriptionNames = new List<string>();
+            this.setAsideSites = new Dictionary<string, List<Location>>();
         }
 
         //---------------------------------------------------------------------

@@ -44,6 +44,7 @@ namespace Landis.Library.HarvestManagement
             this.additionalCohortCutter = additionalCohortCutter;
             this.additionalSpeciesToPlant = additionalSpeciesToPlant;
             this.additionalSiteSelector = additionalSiteSelector;
+            this.isSingleRepeatPrescription = true;
         }
 
         //---------------------------------------------------------------------
@@ -72,21 +73,11 @@ namespace Landis.Library.HarvestManagement
             }
             base.Harvest(stand);
 
+            // Unmark specific cells that were set aside
             if (stand.IsSetAside)
             {
-                foreach (ActiveSite site in SiteSelector.SelectSites(stand))
-                {
-                    // Unmark the sites here
-                }
+                stand.ClearSetAsideSites(this.Name);
                 this.IsSingleRepeatStep = false;
-            }
-            else
-            {
-                // Ensure that the sites being harvested are the exact ones to be harvested later
-                foreach (ActiveSite site in SiteSelector.SelectSites(stand))
-                {
-                    // Mark the sites here
-                }
             }
 
             return; 
