@@ -29,6 +29,7 @@ namespace Landis.Library.HarvestManagement
         private CohortCounts cohortCounts;
         private bool isSingleRepeatStep;
         protected bool isSingleRepeatPrescription;
+        private int repeatNumber = 0;
         
         //---------------------------------------------------------------------
 
@@ -43,6 +44,33 @@ namespace Landis.Library.HarvestManagement
         {
             get {
                 return number;
+            }
+        }
+
+        /// <summary>
+        /// Increases the repeat number to indicate the prescription is on the next repeat
+        /// </summary>
+        public void IncrementRepeat()
+        {
+            this.repeatNumber++;
+        }
+
+        /// <summary>
+        /// Resets the repeat number
+        /// </summary>
+        public void ResetRepeatNumber()
+        {
+            this.repeatNumber = 0;
+        }
+
+        /// <summary>
+        /// Which repeat iteration the prescription is on, if it is a single or multiple repeat prescription
+        /// </summary>
+        public int RepeatNumber
+        {
+            get
+            {
+                return this.repeatNumber;
             }
         }
 

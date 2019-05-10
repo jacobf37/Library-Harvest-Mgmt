@@ -282,6 +282,32 @@ namespace Landis.Library.HarvestManagement
                     //prescription.Prescription.SiteSelectionMethod = new CompleteStand();
                     //Model.Core.UI.WriteLine("      Attempting to Re-Harvest {0}.", prescription.Prescription.Name);
                     ((AppliedRepeatHarvest) prescription).HarvestReservedStands();
+
+                    if (totalSites[prescription.Number] > 0 && prescriptionReported[prescription.Number] != true)
+                    {
+                        SummaryLog sl = new SummaryLog();
+                        sl.Time = Model.Core.CurrentTime;
+                        sl.ManagementArea = this.MapCode;
+                        sl.Prescription = prescription.Prescription.Name + "(" + 
+                            prescription.Prescription.RepeatNumber + ")";
+                        sl.HarvestedSites = totalDamagedSites[prescription.Number];
+                        sl.TotalBiomassHarvested = totalBiomassRemoved[prescription.Number];
+                        sl.TotalCohortsPartialHarvest = totalCohortsDamaged[prescription.Number];
+                        sl.TotalCohortsCompleteHarvest = totalCohortsKilled[prescription.Number];
+                        sl.CohortsHarvested_ = species_cohorts;
+                        sl.BiomassHarvestedMg_ = species_biomass;
+                        summaryLog.AddObject(sl);
+                        summaryLog.WriteToFile();
+
+                        prescriptionReported[prescription.Number] = true;
+                    }
+
+                    ((AppliedRepeatHarvest)prescription).ResetLogValues();
+
+                    if (!((AppliedRepeatHarvest)prescription).IsMultipleRepeatHarvest)
+                    {
+                        prescription.Prescription.ResetRepeatNumber();
+                    }
                 }
             } 
 

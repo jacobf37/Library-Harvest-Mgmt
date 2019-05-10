@@ -158,6 +158,8 @@ namespace Landis.Library.HarvestManagement
             ReadVar(summaryLogFile);
             parameters.SummaryLog = summaryLogFile.Value;
 
+            Log.Initialize(eventLogFile.Value, summaryLogFile.Value);
+
             CheckNoDataAfter("the " + summaryLogFile.Name + " parameter");
             return parameters; //.GetComplete();
         }
