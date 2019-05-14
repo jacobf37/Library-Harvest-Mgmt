@@ -327,7 +327,6 @@ namespace Landis.Library.HarvestManagement
                 HarvestExtensionMain.OnSiteHarvest(this, site);
             }
 
-
             if (speciesToPlant != null)
             {
 
