@@ -103,11 +103,11 @@ namespace Landis.Library.HarvestManagement
         //---------------------------------------------------------------------
 
         /// <summary>
-        /// Sets a stand aside for multiple additional harvests.
+        /// Sets a stand aside for multiple additional harvests. These will be set aside until the end of the run
         /// </summary>
         public void SetAsideForMultipleHarvests(Stand stand)
         {
-            stand.SetAsideUntil(EndTime);
+            stand.SetAsideUntil(Model.Core.EndTime);
         }
 
         //---------------------------------------------------------------------
@@ -139,7 +139,7 @@ namespace Landis.Library.HarvestManagement
         protected void ScheduleNextHarvest(Stand stand)
         {
             int nextTimeToHarvest = Model.Core.CurrentTime + repeatHarvest.Interval;
-            if (nextTimeToHarvest <= EndTime)
+            if (nextTimeToHarvest <= Model.Core.EndTime)
                 reservedStands.Enqueue(new ReservedStand(stand, nextTimeToHarvest));
         }
 
@@ -147,27 +147,34 @@ namespace Landis.Library.HarvestManagement
 
         /// <summary>
         /// Harvests the stands that have repeat harvests scheduled for the
-        /// current time step.
+        /// current time step. Returns true if stands were harvested, false if not.
         /// </summary>
-        public void HarvestReservedStands()
+        public bool HarvestReservedStands()
         {
-            this.repeatHarvest.IncrementRepeat();
+            bool harvested = false;
 
             while (reservedStands.Count > 0 &&
                    reservedStands.Peek().NextTimeToHarvest <= Model.Core.CurrentTime)
             {
                 //Stand stand = reservedStands.Dequeue().Stand;
+                if (!harvested)
+                {
+                    harvested = true;
+                    this.repeatHarvest.IncrementRepeat();
+                }
+
                 Stand stand = reservedStands.Peek().Stand;
 
                 repeatHarvest.Harvest(stand);
+
+                HarvestExtensionMain.OnRepeatStandHarvest(this, stand, this.repeatHarvest.RepeatNumber);
 
                 stand = reservedStands.Dequeue().Stand;
 
                 if (isMultipleRepeatHarvest)
                     ScheduleNextHarvest(stand);
-
-                HarvestExtensionMain.OnRepeatStandHarvest(this, stand, this.repeatHarvest.RepeatNumber);
             }
+            return harvested;
         }
     }
 }

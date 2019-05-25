@@ -237,8 +237,7 @@ namespace Landis.Library.HarvestManagement
                         prescription.ApplyPrescription = true;
                     }
                     else if (prescription is AppliedRepeatHarvest &&
-                        Model.Core.CurrentTime > 0 &&
-                        !((AppliedRepeatHarvest)prescription).HasBeenHarvested)
+                        Model.Core.CurrentTime > 0 && ((AppliedRepeatHarvest)prescription).IsMultipleRepeatHarvest)
                     {
                         prescription.ApplyPrescription = true;
                         ((AppliedRepeatHarvest)prescription).HasBeenHarvested = true;
@@ -281,9 +280,11 @@ namespace Landis.Library.HarvestManagement
                 {
                     //prescription.Prescription.SiteSelectionMethod = new CompleteStand();
                     //Model.Core.UI.WriteLine("      Attempting to Re-Harvest {0}.", prescription.Prescription.Name);
-                    ((AppliedRepeatHarvest) prescription).HarvestReservedStands();
-
-                    HarvestExtensionMain.OnRepeatHarvestFinished(this, prescription.Prescription, this);
+                    if (((AppliedRepeatHarvest)prescription).HarvestReservedStands())
+                    {
+                        // Only write to the summary log if there were reserved stands to harvest
+                        HarvestExtensionMain.OnRepeatHarvestFinished(this, prescription.Prescription, this);
+                    }
 
                     if (!((AppliedRepeatHarvest)prescription).IsMultipleRepeatHarvest)
                     {
