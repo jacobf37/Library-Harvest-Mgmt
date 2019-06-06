@@ -17,7 +17,7 @@ namespace Landis.Library.HarvestManagement
             /// <summary>
             /// The prescription that just finished its repeat harvest
             /// </summary>
-            public Prescription Prescription { get; protected set; }
+            public AppliedPrescription Prescription { get; protected set; }
 
             /// <summary>
             /// The management area the prescription belongs to
@@ -25,13 +25,25 @@ namespace Landis.Library.HarvestManagement
             public ManagementArea MgmtArea { get; protected set; }
 
             /// <summary>
+            /// Tracks what repeat the stands were on
+            /// </summary>
+            public uint RepeatNumber { get; protected set; }
+
+            /// <summary>
+            /// Indicates if this is the last repeat harvest for the time step for logging purposes
+            /// </summary>
+            public bool LastHarvest { get; protected set; }
+
+            /// <summary>
             /// Creates a new instance.
             /// </summary>
             /// <param name="site">The prescription that just finished its repeat harvest</param>
-            public Args(Prescription prescription, ManagementArea mgmtArea)
+            public Args(AppliedPrescription prescription, ManagementArea mgmtArea, uint repeatNumber, bool lastHarvest)
             {
                 Prescription = prescription;
                 MgmtArea = mgmtArea;
+                RepeatNumber = repeatNumber;
+                LastHarvest = lastHarvest;
             }
         }
 

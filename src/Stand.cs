@@ -16,6 +16,8 @@ namespace Landis.Library.HarvestManagement
         : IEnumerable<ActiveSite>
     {
         private uint mapCode;
+        private uint repeatNumber;
+        private bool repeatHarvested;
         private List<Location> siteLocations;
         private double activeArea;
         private ManagementArea mgmtArea;
@@ -62,6 +64,52 @@ namespace Landis.Library.HarvestManagement
         }
 
         //---------------------------------------------------------------------
+
+        /// <summary>
+        /// Tracks how many times this stand has been repeat harvested by the current prescription
+        /// </summary>
+        public uint RepeatNumber
+        {
+            get
+            {
+                return repeatNumber;
+            }
+        }
+
+        /// <summary>
+        /// Increases how many times this stand has been repeat harvested
+        /// </summary>
+        public void IncrementRepeat()
+        {
+            this.repeatNumber++;
+        }
+
+        /// <summary>
+        /// Indicates if this stand was repeat harvested in the current timestep
+        /// </summary>
+        public bool RepeatHarvested
+        {
+            get
+            {
+                return this.repeatHarvested;
+            }
+        }
+
+        /// <summary>
+        /// Flips the flag indicating if the stand had a repeat harvest in the current time step
+        /// </summary>
+        public void SetRepeatHarvested()
+        {
+            this.repeatHarvested = !this.repeatHarvested;
+        }
+
+        /// <summary>
+        /// Resets the repeat number
+        /// </summary>
+        public void ResetRepeatNumber()
+        {
+            this.repeatNumber = 0;
+        }
 
         /// <summary>
         /// All the site locations in the stand, as specified in the stand map.
@@ -393,6 +441,8 @@ namespace Landis.Library.HarvestManagement
             this.DamageTable = new CohortCounts();
             this.rejectedPrescriptionNames = new List<string>();
             this.setAsideSites = new Dictionary<string, List<Location>>();
+            this.repeatNumber = 0;
+            this.repeatHarvested = false;
         }
 
         //---------------------------------------------------------------------

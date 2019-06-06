@@ -280,16 +280,9 @@ namespace Landis.Library.HarvestManagement
                 {
                     //prescription.Prescription.SiteSelectionMethod = new CompleteStand();
                     //Model.Core.UI.WriteLine("      Attempting to Re-Harvest {0}.", prescription.Prescription.Name);
-                    if (((AppliedRepeatHarvest)prescription).HarvestReservedStands())
-                    {
-                        // Only write to the summary log if there were reserved stands to harvest
-                        HarvestExtensionMain.OnRepeatHarvestFinished(this, prescription.Prescription, this);
-                    }
-
-                    if (!((AppliedRepeatHarvest)prescription).IsMultipleRepeatHarvest)
-                    {
-                        prescription.Prescription.ResetRepeatNumber();
-                    }
+                    ((AppliedRepeatHarvest)prescription).ActiveMgmtArea = this;
+                    ((AppliedRepeatHarvest)prescription).HarvestReservedStands();
+                    ((AppliedRepeatHarvest)prescription).ActiveMgmtArea = null;
                 }
             } 
 

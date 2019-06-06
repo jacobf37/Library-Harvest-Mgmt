@@ -5,6 +5,7 @@ using Landis.SpatialModeling;
 using System;
 using System.Collections.Generic;
 using Landis.Core;
+using System.Linq;
 
 namespace Landis.Library.HarvestManagement
 {
@@ -26,6 +27,9 @@ namespace Landis.Library.HarvestManagement
         //  The queue is in the chronological order.
         public Queue<ReservedStand> reservedStands;
         IDictionary<ISpecies, double> totalBiomassBySpecies = new Dictionary<ISpecies, double>();
+        
+        // The management area the prescription is currently acting on
+        public ManagementArea ActiveMgmtArea;
 
         //---------------------------------------------------------------------
 
@@ -52,6 +56,7 @@ namespace Landis.Library.HarvestManagement
                 setAside = SetAsideForMultipleHarvests;
             }
             this.reservedStands = new Queue<ReservedStand>();
+            this.ActiveMgmtArea = null;
         }
 
         //---------------------------------------------------------------------
@@ -140,41 +145,61 @@ namespace Landis.Library.HarvestManagement
         {
             int nextTimeToHarvest = Model.Core.CurrentTime + repeatHarvest.Interval;
             if (nextTimeToHarvest <= Model.Core.EndTime)
+            {
                 reservedStands.Enqueue(new ReservedStand(stand, nextTimeToHarvest));
+            }
+            else
+            {
+                stand.ResetRepeatNumber();
+            }
         }
 
         //---------------------------------------------------------------------
 
         /// <summary>
         /// Harvests the stands that have repeat harvests scheduled for the
-        /// current time step. Returns true if stands were harvested, false if not.
+        /// current time step.
         /// </summary>
-        public bool HarvestReservedStands()
-        {
-            bool harvested = false;
-
+        public void HarvestReservedStands()
+        {   
             while (reservedStands.Count > 0 &&
                    reservedStands.Peek().NextTimeToHarvest <= Model.Core.CurrentTime)
             {
                 //Stand stand = reservedStands.Dequeue().Stand;
-                if (!harvested)
-                {
-                    harvested = true;
-                    this.repeatHarvest.IncrementRepeat();
-                }
 
                 Stand stand = reservedStands.Peek().Stand;
 
+                uint repeat = stand.RepeatNumber;
+
                 repeatHarvest.Harvest(stand);
 
-                HarvestExtensionMain.OnRepeatStandHarvest(this, stand, this.repeatHarvest.RepeatNumber);
+                stand.SetRepeatHarvested();
+
+                stand.IncrementRepeat();
+
+                HarvestExtensionMain.OnRepeatStandHarvest(this, stand, stand.RepeatNumber);
 
                 stand = reservedStands.Dequeue().Stand;
 
+                // Record every instance of a repeat harvest
+                if (reservedStands.Count > 0 && reservedStands.Peek().Stand.RepeatNumber != repeat)
+                {
+                    HarvestExtensionMain.OnRepeatHarvestFinished(this, this, this.ActiveMgmtArea, repeat + 1, false);
+                }
+                else if (reservedStands.Count == 0 || reservedStands.Peek().NextTimeToHarvest > Model.Core.CurrentTime)
+                {
+                    HarvestExtensionMain.OnRepeatHarvestFinished(this, this, this.ActiveMgmtArea, repeat + 1, true);
+                }
+
                 if (isMultipleRepeatHarvest)
+                {
                     ScheduleNextHarvest(stand);
+                }
+                else
+                {
+                    stand.ResetRepeatNumber();
+                }
             }
-            return harvested;
         }
     }
 }

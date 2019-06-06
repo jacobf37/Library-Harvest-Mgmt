@@ -55,7 +55,7 @@ namespace Landis.Library.HarvestManagement
         /// </summary>
         public static void OnRepeatStandHarvest(object sender,
                                          Stand stand,
-                                         int repeatNumber)
+                                         uint repeatNumber)
         {
             if (RepeatStandHarvestedEvent != null)
                 RepeatStandHarvestedEvent(sender, new RepeatHarvestStandHarvestedEvent.Args(stand, repeatNumber));
@@ -65,11 +65,13 @@ namespace Landis.Library.HarvestManagement
         /// Signals that a prescription is finished with a repeat step
         /// </summary>
         public static void OnRepeatHarvestFinished(object sender,
-                                         Prescription prescription,
-                                         ManagementArea mgmtArea)
+                                         AppliedPrescription prescription,
+                                         ManagementArea mgmtArea,
+                                         uint repeatNumber,
+                                         bool lastHarvest)
         {
             if (RepeatPrescriptionFinishedEvent != null)
-                RepeatPrescriptionFinishedEvent(sender, new RepeatHarvestPrescriptionFinishedEvent.Args(prescription, mgmtArea));
+                RepeatPrescriptionFinishedEvent(sender, new RepeatHarvestPrescriptionFinishedEvent.Args(prescription, mgmtArea, repeatNumber, lastHarvest));
         }
     }
 }

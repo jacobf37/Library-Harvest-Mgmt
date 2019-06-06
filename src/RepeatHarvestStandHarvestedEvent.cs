@@ -27,13 +27,13 @@ namespace Landis.Library.HarvestManagement
             /// <summary>
             /// Which repeat the prescription is on
             /// </summary>
-            public int RepeatNumber { get; protected set; }
+            public uint RepeatNumber { get; protected set; }
 
             /// <summary>
             /// Creates a new instance.
             /// </summary>
             /// <param name="site">The stand that was just harvested.</param>
-            public Args(Stand stand, int repeatNumber)
+            public Args(Stand stand, uint repeatNumber)
             {
                 Stand = stand;
                 MgmtArea = stand.ManagementArea;

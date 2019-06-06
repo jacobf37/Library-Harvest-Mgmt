@@ -3,6 +3,7 @@
 using Landis.Library.SiteHarvest;
 using Landis.Library.Succession;
 using Landis.SpatialModeling;
+using System;
 
 namespace Landis.Library.HarvestManagement
 {
@@ -14,8 +15,9 @@ namespace Landis.Library.HarvestManagement
     public class SingleRepeatHarvest
         : RepeatHarvest
     {
-        private ICohortCutter initialCohortSelector;
+        private ICohortCutter initialCohortCutter;
         private Planting.SpeciesList initialSpeciesToPlant;
+        private ISiteSelector initialSiteSelector;
 
         private ICohortCutter additionalCohortCutter;
         private Planting.SpeciesList additionalSpeciesToPlant;
@@ -38,7 +40,8 @@ namespace Landis.Library.HarvestManagement
                    additionalSiteSelector, minTimeSinceDamage, preventEstablishment,
                    interval)
         {
-            this.initialCohortSelector = cohortCutter;
+            this.initialCohortCutter = cohortCutter;
+            this.initialSiteSelector = SiteSelector;
             this.initialSpeciesToPlant = speciesToPlant;
 
             this.additionalCohortCutter = additionalCohortCutter;
@@ -68,7 +71,8 @@ namespace Landis.Library.HarvestManagement
                 this.IsSingleRepeatStep = true;
             }
             else {
-                CohortCutter = initialCohortSelector;
+                CohortCutter = initialCohortCutter;
+                SiteSelector = initialSiteSelector;
                 SpeciesToPlant = initialSpeciesToPlant;
             }
             base.Harvest(stand);
