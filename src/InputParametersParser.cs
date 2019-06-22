@@ -6,6 +6,7 @@ using Landis.Library.SiteHarvest;
 using Landis.Library.Succession;
 using System.Collections.Generic;
 using System.Text;
+using System;
 
 using FormatException = System.FormatException;
 
@@ -744,11 +745,34 @@ namespace Landis.Library.HarvestManagement
                 TextReader.SkipWhitespace(reader);
                 index = reader.Index;
                 string priority = TextReader.ReadWord(reader);
+                string allowOverlap = string.Empty;
 
-                selector = new PatchCutting(percentage.Value.Actual, size.Value.Actual, priority);
-                valueAsStr.AppendFormat(" {0} {1} {2}", percentage.Value.String,
+
+                // AllowOverlap can appear by itself after the patch size, or after the priority, or not at all
+                if (string.IsNullOrEmpty(priority))
+                {
+                    selector = new PatchCutting(percentage.Value.Actual, size.Value.Actual, priority, string.Empty);
+                }
+                else
+                {
+                    if (priority.Equals("allowoverlap", StringComparison.OrdinalIgnoreCase))
+                    {
+                        allowOverlap = priority;
+                        priority = string.Empty;
+                        selector = new PatchCutting(percentage.Value.Actual, size.Value.Actual, priority, allowOverlap);
+                    }
+                    else
+                    {
+                        TextReader.SkipWhitespace(reader);
+                        index = reader.Index;
+                        allowOverlap = TextReader.ReadWord(reader);
+                        selector = new PatchCutting(percentage.Value.Actual, size.Value.Actual, priority, allowOverlap);
+                    }
+                }
+                valueAsStr.AppendFormat(" {0} {1} {2} {3}", percentage.Value.String,
                                                     size.Value.String,
-                                                    priority);
+                                                    priority,
+                                                    allowOverlap);
             }
 
             else {
