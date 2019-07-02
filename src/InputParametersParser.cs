@@ -48,6 +48,7 @@ namespace Landis.Library.HarvestManagement
             public const string ForestTypeTable = "ForestTypeTable";
             public const string StandAdjacency = "StandAdjacency";
             public const string PresalvageYears = "PresalvageYears";
+            public const string TimesToRepeat = "TimesToRepeat";
         }
 
         //---------------------------------------------------------------------
@@ -206,6 +207,7 @@ namespace Landis.Library.HarvestManagement
 
             InputVar<int> singleRepeat = new InputVar<int>(Names.SingleRepeat);
             InputVar<int> multipleRepeat = new InputVar<int>(Names.MultipleRepeat);
+            InputVar<int> timesToRepeat = new InputVar<int>(Names.TimesToRepeat);
 
             int nameLineNumber = LineNumber;
             InputVar<string> prescriptionName = new InputVar<string>(Names.Prescription);
@@ -245,6 +247,7 @@ namespace Landis.Library.HarvestManagement
 
                 //  Repeat harvest?
                 int repeatParamLineNumber = LineNumber;
+                string currentLine = this.CurrentLine;
                 if (ReadOptionalVar(singleRepeat)) {
                     int interval = ValidateRepeatInterval(singleRepeat.Value,
                                                           repeatParamLineNumber,
@@ -269,8 +272,33 @@ namespace Landis.Library.HarvestManagement
                     int interval = ValidateRepeatInterval(multipleRepeat.Value,
                                                           repeatParamLineNumber,
                                                           harvestTimestep);
+
                     ISiteSelector additionalSiteSelector = new CompleteStand();
-                    prescriptions.Add(new RepeatHarvest(name,
+                    bool repeatSet = ReadOptionalVar(timesToRepeat);
+                    if (repeatSet)
+                    {
+                        if (timesToRepeat.Value == 0)
+                        {
+                            throw new Exception("Multiple Repeat requires repeats.");
+                        }
+                        else if (timesToRepeat.Value == 1)
+                        {
+                            throw new Exception("Multiple Repeat requires more than one repeat, use Single Repeat instead.");
+                        }
+                        prescriptions.Add(new RepeatHarvest(name,
+                                                        rankingMethod,
+                                                        siteSelector,
+                                                        cohortCutter,
+                                                        speciesToPlant,
+                                                        additionalSiteSelector,
+                                                        minTimeSinceDamage,
+                                                        preventEstablishment,
+                                                        interval,
+                                                        timesToRepeat.Value));
+                    }
+                    else
+                    {
+                        prescriptions.Add(new RepeatHarvest(name,
                                                         rankingMethod,
                                                         siteSelector,
                                                         cohortCutter,
@@ -279,6 +307,7 @@ namespace Landis.Library.HarvestManagement
                                                         minTimeSinceDamage,
                                                         preventEstablishment,
                                                         interval));
+                    }
                 }
                 else {
                     prescriptions.Add(new Prescription(name,

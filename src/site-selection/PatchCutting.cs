@@ -52,6 +52,9 @@ namespace Landis.Library.HarvestManagement
                     "Patch size cannot be negative");
         }
 
+        // TODO: This may be redundant code now that the patch cutting algorithm has been revised and allow overlap
+        // implemented. PatchCutPriority may be something that can be removed, or at the least changed to be more
+        // relevant
         private static class PatchCutPriority {
             //Names for each acceptable patch cut priority
             public const string PatchSize = "PatchSize";    //preserve 1 cell buffer between patches; Disregard PercentCut minimum

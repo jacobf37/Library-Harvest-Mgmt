@@ -17,6 +17,7 @@ namespace Landis.Library.HarvestManagement
         private StandSpreading spreadingSiteSelector;
         private List<Stand> harvestedStands;
         private ISiteSelector additionalSiteSelector;
+        private int timesToRepeat;
 
         //---------------------------------------------------------------------
 
@@ -31,6 +32,17 @@ namespace Landis.Library.HarvestManagement
         {
             get {
                 return interval;
+            }
+        }
+
+        /// <summary>
+        /// How many times the prescription should repeat, supplied by the user
+        /// </summary>
+        public int TimesToRepeat
+        {
+            get
+            {
+                return timesToRepeat;
             }
         }
 
@@ -57,13 +69,23 @@ namespace Landis.Library.HarvestManagement
                              ISiteSelector        additionalSiteSelector,
                              int                  minTimeSinceDamage,
                              bool                 preventEstablishment,
-                             int                  interval)
+                             int                  interval,
+                             int                  timesToRepeat = 0)
             : base(name, rankingMethod, siteSelector, cohortCutter, speciesToPlant, minTimeSinceDamage, preventEstablishment)
         {
             this.interval = interval;
             this.spreadingSiteSelector = siteSelector as StandSpreading;
             this.additionalSiteSelector = additionalSiteSelector;
             this.harvestedStands = new List<Stand>();
+
+            if (timesToRepeat > 1)
+            {
+                this.timesToRepeat = timesToRepeat;
+            }
+            else
+            {
+                this.timesToRepeat = int.MaxValue;
+            }
         }
 
         //---------------------------------------------------------------------

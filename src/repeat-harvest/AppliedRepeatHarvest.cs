@@ -144,12 +144,16 @@ namespace Landis.Library.HarvestManagement
         protected void ScheduleNextHarvest(Stand stand)
         {
             int nextTimeToHarvest = Model.Core.CurrentTime + repeatHarvest.Interval;
-            if (nextTimeToHarvest <= Model.Core.EndTime)
+            if (nextTimeToHarvest <= Model.Core.EndTime && stand.RepeatNumber < this.repeatHarvest.TimesToRepeat)
             {
                 reservedStands.Enqueue(new ReservedStand(stand, nextTimeToHarvest));
             }
             else
             {
+                if (stand.RepeatNumber >= this.repeatHarvest.TimesToRepeat)
+                {
+                    stand.SetAsideUntil(Model.Core.CurrentTime);
+                }
                 stand.ResetRepeatNumber();
             }
         }
