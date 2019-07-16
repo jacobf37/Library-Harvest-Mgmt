@@ -20,7 +20,6 @@ namespace Landis.Library.HarvestManagement
         private double percent;      // percent of stand to harvest
         private double patch_size;   // harvest patch sizes
         private double areaSelected; // total area selected
-        private string priority;     // patch cutting priority (optional)
         private bool allowOverlap;   // indicates whether or not patches can be cut that are adjacent to each other
         
         //collect all 8 relative neighbor locations in array
@@ -51,27 +50,11 @@ namespace Landis.Library.HarvestManagement
                 throw new InputValueException(size.String,
                     "Patch size cannot be negative");
         }
-
-        // TODO: This may be redundant code now that the patch cutting algorithm has been revised and allow overlap
-        // implemented. PatchCutPriority may be something that can be removed, or at the least changed to be more
-        // relevant
-        private static class PatchCutPriority {
-            //Names for each acceptable patch cut priority
-            public const string PatchSize = "PatchSize";    //preserve 1 cell buffer between patches; Disregard PercentCut minimum
-            public const string PercentCut = "PercentCut";  //no buffer between patches
-            public const string NoPriority = "NoPriority";  //Patch size and percent cut are equal
-        }
         
         //constructor
-        public PatchCutting(Percentage percentage, double size, string priority, string allowOverlap) {
+        public PatchCutting(Percentage percentage, double size, string allowOverlap) {
             this.percent = (double) percentage;
             this.patch_size = size;
-            if (string.IsNullOrEmpty(priority)) {
-                this.priority = PatchCutPriority.NoPriority;
-            }
-            else {
-                this.priority = priority;
-            }
 
             if (string.IsNullOrEmpty(allowOverlap))
             {
@@ -79,7 +62,7 @@ namespace Landis.Library.HarvestManagement
             }
             else
             {
-                if (allowOverlap.Equals("allowoverlap", StringComparison.OrdinalIgnoreCase))
+                if (allowOverlap.Equals("AllowOverlap"))
                 {
                     this.allowOverlap = true;
                 }
@@ -311,9 +294,8 @@ namespace Landis.Library.HarvestManagement
             // if the stand met the criteria for the harvest, mark it
             // as harvested otherwise add the prescription name to the
             // stands rejected prescription list
-            // if priority = PatchSize that overrides targetArea as priority for the harvest
 
-            if (areaSelected > 0 || priority == PatchCutPriority.PatchSize) {
+            if (areaSelected > 0) {
                 stand.MarkAsHarvested();
                 stand.EventId = EventId.MakeNewId();
             } else {
@@ -321,9 +303,8 @@ namespace Landis.Library.HarvestManagement
                 stand.RejectPrescriptionName(stand.PrescriptionName);
             }
 
-            // if harvest criteria met (includes priority), yield the sites, else, don't
             // even if patches do not reach target percentage, harvest what we can
-            if (areaSelected > 0 || priority == PatchCutPriority.PatchSize)
+            if (areaSelected > 0)
             {
                 while (sitesToHarvest.Count > 0) {
                     yield return sitesToHarvest.Dequeue();

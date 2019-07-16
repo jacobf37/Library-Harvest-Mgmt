@@ -16,7 +16,6 @@ namespace Landis.Library.HarvestManagement
         private int interval;
         private StandSpreading spreadingSiteSelector;
         private List<Stand> harvestedStands;
-        private ISiteSelector additionalSiteSelector;
         private int timesToRepeat;
 
         //---------------------------------------------------------------------
@@ -66,7 +65,6 @@ namespace Landis.Library.HarvestManagement
                              ISiteSelector        siteSelector,
                              ICohortCutter        cohortCutter,
                              Planting.SpeciesList speciesToPlant,
-                             ISiteSelector        additionalSiteSelector,
                              int                  minTimeSinceDamage,
                              bool                 preventEstablishment,
                              int                  interval,
@@ -75,7 +73,6 @@ namespace Landis.Library.HarvestManagement
         {
             this.interval = interval;
             this.spreadingSiteSelector = siteSelector as StandSpreading;
-            this.additionalSiteSelector = additionalSiteSelector;
             this.harvestedStands = new List<Stand>();
 
             if (timesToRepeat > 1)
@@ -98,12 +95,7 @@ namespace Landis.Library.HarvestManagement
         /// The area that was harvested (units: hectares).
         /// </returns>
         public override void Harvest(Stand stand)
-        {
-            if (stand.IsSetAside)
-            {
-                SiteSelector = additionalSiteSelector;
-            }
-            
+        {   
             base.Harvest(stand);
             
             harvestedStands.Clear();

@@ -255,7 +255,6 @@ namespace Landis.Library.HarvestManagement
                     ICohortSelector additionalCohortSelector = ReadCohortSelector(true);
                     ICohortCutter additionalCohortCutter = CreateAdditionalCohortCutter(additionalCohortSelector);
                     Planting.SpeciesList additionalSpeciesToPlant = ReadSpeciesToPlant();
-                    ISiteSelector additionalSiteSelector = new CompleteStand();
                     prescriptions.Add(new SingleRepeatHarvest(name,
                                                               rankingMethod,
                                                               siteSelector,
@@ -263,7 +262,6 @@ namespace Landis.Library.HarvestManagement
                                                               speciesToPlant,
                                                               additionalCohortCutter,
                                                               additionalSpeciesToPlant,
-                                                              additionalSiteSelector,
                                                               minTimeSinceDamage,
                                                               preventEstablishment,
                                                               interval));
@@ -273,7 +271,6 @@ namespace Landis.Library.HarvestManagement
                                                           repeatParamLineNumber,
                                                           harvestTimestep);
 
-                    ISiteSelector additionalSiteSelector = new CompleteStand();
                     bool repeatSet = ReadOptionalVar(timesToRepeat);
                     if (repeatSet)
                     {
@@ -290,7 +287,6 @@ namespace Landis.Library.HarvestManagement
                                                         siteSelector,
                                                         cohortCutter,
                                                         speciesToPlant,
-                                                        additionalSiteSelector,
                                                         minTimeSinceDamage,
                                                         preventEstablishment,
                                                         interval,
@@ -303,7 +299,6 @@ namespace Landis.Library.HarvestManagement
                                                         siteSelector,
                                                         cohortCutter,
                                                         speciesToPlant,
-                                                        additionalSiteSelector,
                                                         minTimeSinceDamage,
                                                         preventEstablishment,
                                                         interval));
@@ -770,37 +765,15 @@ namespace Landis.Library.HarvestManagement
                 ReadValue(size, reader);
                 PatchCutting.ValidateSize(size.Value);
 
-                // priority is an optional value so we can't use ReadValue
+                string allowOverlap = string.Empty;
                 TextReader.SkipWhitespace(reader);
                 index = reader.Index;
-                string priority = TextReader.ReadWord(reader);
-                string allowOverlap = string.Empty;
+                allowOverlap = TextReader.ReadWord(reader);
+                selector = new PatchCutting(percentage.Value.Actual, size.Value.Actual, allowOverlap);
 
 
-                // AllowOverlap can appear by itself after the patch size, or after the priority, or not at all
-                if (string.IsNullOrEmpty(priority))
-                {
-                    selector = new PatchCutting(percentage.Value.Actual, size.Value.Actual, priority, string.Empty);
-                }
-                else
-                {
-                    if (priority.Equals("allowoverlap", StringComparison.OrdinalIgnoreCase))
-                    {
-                        allowOverlap = priority;
-                        priority = string.Empty;
-                        selector = new PatchCutting(percentage.Value.Actual, size.Value.Actual, priority, allowOverlap);
-                    }
-                    else
-                    {
-                        TextReader.SkipWhitespace(reader);
-                        index = reader.Index;
-                        allowOverlap = TextReader.ReadWord(reader);
-                        selector = new PatchCutting(percentage.Value.Actual, size.Value.Actual, priority, allowOverlap);
-                    }
-                }
-                valueAsStr.AppendFormat(" {0} {1} {2} {3}", percentage.Value.String,
+                valueAsStr.AppendFormat(" {0} {1} {2}", percentage.Value.String,
                                                     size.Value.String,
-                                                    priority,
                                                     allowOverlap);
             }
 

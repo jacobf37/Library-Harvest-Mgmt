@@ -21,7 +21,6 @@ namespace Landis.Library.HarvestManagement
 
         private ICohortCutter additionalCohortCutter;
         private Planting.SpeciesList additionalSpeciesToPlant;
-        private ISiteSelector additionalSiteSelector;
 
         //---------------------------------------------------------------------
 
@@ -32,13 +31,11 @@ namespace Landis.Library.HarvestManagement
                                    Planting.SpeciesList speciesToPlant,
                                    ICohortCutter        additionalCohortCutter,
                                    Planting.SpeciesList additionalSpeciesToPlant,
-                                   ISiteSelector        additionalSiteSelector,
                                    int                  minTimeSinceDamage,
                                    bool                 preventEstablishment,
                                    int                  interval)
             : base(name, rankingMethod, siteSelector, cohortCutter, speciesToPlant,
-                   additionalSiteSelector, minTimeSinceDamage, preventEstablishment,
-                   interval)
+                   minTimeSinceDamage, preventEstablishment, interval)
         {
             this.initialCohortCutter = cohortCutter;
             this.initialSiteSelector = SiteSelector;
@@ -46,7 +43,6 @@ namespace Landis.Library.HarvestManagement
 
             this.additionalCohortCutter = additionalCohortCutter;
             this.additionalSpeciesToPlant = additionalSpeciesToPlant;
-            this.additionalSiteSelector = additionalSiteSelector;
             this.isSingleRepeatPrescription = true;
         }
 
@@ -64,7 +60,6 @@ namespace Landis.Library.HarvestManagement
             if (stand.IsSetAside) {
                 CohortCutter = additionalCohortCutter;
                 SpeciesToPlant = additionalSpeciesToPlant;
-                SiteSelector = additionalSiteSelector; // new CompleteStand();
                 //
                 //if(this.SiteSelectionMethod.GetType() == Landis.Extension.BiomassHarvest.PartialStandSpreading)
                 //  SiteSelector = BiomassHarvest.WrapSiteSelector(SiteSelector);
@@ -72,7 +67,6 @@ namespace Landis.Library.HarvestManagement
             }
             else {
                 CohortCutter = initialCohortCutter;
-                SiteSelector = initialSiteSelector;
                 SpeciesToPlant = initialSpeciesToPlant;
             }
             base.Harvest(stand);
