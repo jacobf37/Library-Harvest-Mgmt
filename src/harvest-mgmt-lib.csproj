@@ -5,7 +5,7 @@
     <AssemblyTitle>Landis.Library.HarvestManagement-v3</AssemblyTitle>
     <AssemblyCompany>LANDIS-II Foundation</AssemblyCompany>
     <AssemblyProduct>Landis.Library.HarvestManagement-v3</AssemblyProduct>    
-    <AssemblyVersion>3.0</AssemblyVersion>
+    <AssemblyVersion>4.0</AssemblyVersion>
     <AssemblyDescription>Harvest Library for LANDIS-II</AssemblyDescription>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -17,7 +17,7 @@
     <Authors>Landis-II-Foundation</Authors>         
     <Product>Harvest Library</Product>
     <Copyright>LANDIS-II Foundation</Copyright>   
-    <Version>3.0</Version> 
+    <Version>4.0</Version> 
     <PackageTags>LANDIS-II;Landis;Library;Harvest Management</PackageTags>
     <Description>Harvest Library for LANDIS-II</Description>
     <PackageReleaseNotes>.NET Standard 2.0 update.</PackageReleaseNotes>
