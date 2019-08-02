@@ -71,6 +71,11 @@ namespace Landis.Library.HarvestManagement
         /// </summary>
         public static ISiteVar<bool> LandUseAllowHarvest { get; private set; }
 
+        /// <summary>
+        /// Keeps track of the biomass lost from each site
+        /// </summary>
+        public static ISiteVar<double> BiomassRemoved { get; set; }
+
         //---------------------------------------------------------------------
 
         /// <summary>
@@ -86,6 +91,7 @@ namespace Landis.Library.HarvestManagement
             PrescriptionName = Model.Core.Landscape.NewSiteVar<string>();
             CohortsDamaged   = Model.Core.Landscape.NewSiteVar<int>();
             TimeOfLastEvent  = Model.Core.Landscape.NewSiteVar<int>();
+            BiomassRemoved = Model.Core.Landscape.NewSiteVar<double>();
 
             Model.Core.RegisterSiteVar(SiteVars.PrescriptionName, "Harvest.PrescriptionName");
             //Model.Core.RegisterSiteVar(SiteVars.Prescription, "Harvest.PrescriptionName");

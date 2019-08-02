@@ -6,6 +6,7 @@ using Landis.Library.SiteHarvest;
 using Landis.Library.Succession;
 using System.Collections.Generic;
 using System.Text;
+using System;
 
 using FormatException = System.FormatException;
 
@@ -47,6 +48,7 @@ namespace Landis.Library.HarvestManagement
             public const string ForestTypeTable = "ForestTypeTable";
             public const string StandAdjacency = "StandAdjacency";
             public const string PresalvageYears = "PresalvageYears";
+            public const string TimesToRepeat = "TimesToRepeat";
         }
 
         //---------------------------------------------------------------------
@@ -205,6 +207,7 @@ namespace Landis.Library.HarvestManagement
 
             InputVar<int> singleRepeat = new InputVar<int>(Names.SingleRepeat);
             InputVar<int> multipleRepeat = new InputVar<int>(Names.MultipleRepeat);
+            InputVar<int> timesToRepeat = new InputVar<int>(Names.TimesToRepeat);
 
             int nameLineNumber = LineNumber;
             InputVar<string> prescriptionName = new InputVar<string>(Names.Prescription);
@@ -244,6 +247,7 @@ namespace Landis.Library.HarvestManagement
 
                 //  Repeat harvest?
                 int repeatParamLineNumber = LineNumber;
+                string currentLine = this.CurrentLine;
                 if (ReadOptionalVar(singleRepeat)) {
                     int interval = ValidateRepeatInterval(singleRepeat.Value,
                                                           repeatParamLineNumber,
@@ -251,7 +255,6 @@ namespace Landis.Library.HarvestManagement
                     ICohortSelector additionalCohortSelector = ReadCohortSelector(true);
                     ICohortCutter additionalCohortCutter = CreateAdditionalCohortCutter(additionalCohortSelector);
                     Planting.SpeciesList additionalSpeciesToPlant = ReadSpeciesToPlant();
-                    ISiteSelector additionalSiteSelector = new CompleteStand();
                     prescriptions.Add(new SingleRepeatHarvest(name,
                                                               rankingMethod,
                                                               siteSelector,
@@ -259,7 +262,6 @@ namespace Landis.Library.HarvestManagement
                                                               speciesToPlant,
                                                               additionalCohortCutter,
                                                               additionalSpeciesToPlant,
-                                                              additionalSiteSelector,
                                                               minTimeSinceDamage,
                                                               preventEstablishment,
                                                               interval));
@@ -268,16 +270,39 @@ namespace Landis.Library.HarvestManagement
                     int interval = ValidateRepeatInterval(multipleRepeat.Value,
                                                           repeatParamLineNumber,
                                                           harvestTimestep);
-                    ISiteSelector additionalSiteSelector = new CompleteStand();
-                    prescriptions.Add(new RepeatHarvest(name,
+
+                    bool repeatSet = ReadOptionalVar(timesToRepeat);
+                    if (repeatSet)
+                    {
+                        if (timesToRepeat.Value == 0)
+                        {
+                            throw new Exception("Multiple Repeat requires repeats.");
+                        }
+                        else if (timesToRepeat.Value == 1)
+                        {
+                            throw new Exception("Multiple Repeat requires more than one repeat, use Single Repeat instead.");
+                        }
+                        prescriptions.Add(new RepeatHarvest(name,
                                                         rankingMethod,
                                                         siteSelector,
                                                         cohortCutter,
                                                         speciesToPlant,
-                                                        additionalSiteSelector,
+                                                        minTimeSinceDamage,
+                                                        preventEstablishment,
+                                                        interval,
+                                                        timesToRepeat.Value));
+                    }
+                    else
+                    {
+                        prescriptions.Add(new RepeatHarvest(name,
+                                                        rankingMethod,
+                                                        siteSelector,
+                                                        cohortCutter,
+                                                        speciesToPlant,
                                                         minTimeSinceDamage,
                                                         preventEstablishment,
                                                         interval));
+                    }
                 }
                 else {
                     prescriptions.Add(new Prescription(name,
@@ -740,15 +765,16 @@ namespace Landis.Library.HarvestManagement
                 ReadValue(size, reader);
                 PatchCutting.ValidateSize(size.Value);
 
-                // priority is an optional value so we can't use ReadValue
+                string allowOverlap = string.Empty;
                 TextReader.SkipWhitespace(reader);
                 index = reader.Index;
-                string priority = TextReader.ReadWord(reader);
+                allowOverlap = TextReader.ReadWord(reader);
+                selector = new PatchCutting(percentage.Value.Actual, size.Value.Actual, allowOverlap);
 
-                selector = new PatchCutting(percentage.Value.Actual, size.Value.Actual, priority);
+
                 valueAsStr.AppendFormat(" {0} {1} {2}", percentage.Value.String,
                                                     size.Value.String,
-                                                    priority);
+                                                    allowOverlap);
             }
 
             else {
