@@ -302,8 +302,10 @@ namespace Landis.Library.HarvestManagement
 
             if (speciesToPlant != null)
             {
-
-                Model.Core.UI.WriteLine("  {0} {1}", speciesToPlant.ToString(), site.ToString());
+                if (isDebugEnabled)
+                {
+                    Model.Core.UI.WriteLine("  {0} {1}", speciesToPlant.ToString(), site.ToString());
+                }
                 Reproduction.ScheduleForPlanting(speciesToPlant, site);
             }
         }

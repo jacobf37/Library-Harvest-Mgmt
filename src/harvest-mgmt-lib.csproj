@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>Landis.Library.HarvestManagement</RootNamespace>
-    <AssemblyName>Landis.Library.HarvestManagement-v3</AssemblyName>
+    <AssemblyName>Landis.Library.HarvestManagement-v4</AssemblyName>
     <AssemblyTitle>Landis.Library.HarvestManagement-v3</AssemblyTitle>
     <AssemblyCompany>LANDIS-II Foundation</AssemblyCompany>
     <AssemblyProduct>Landis.Library.HarvestManagement-v3</AssemblyProduct>    
@@ -43,8 +43,8 @@
     <Reference Include="Landis.Library.SiteHarvest-v2">
       <HintPath>lib\Landis.Library.SiteHarvest-v2.dll</HintPath>
     </Reference>
-    <Reference Include="Landis.Library.Succession-v7">
-      <HintPath>lib\Landis.Library.Succession-v7.dll</HintPath>
+    <Reference Include="Landis.Library.Succession-v8">
+      <HintPath>lib\Landis.Library.Succession-v8.dll</HintPath>
     </Reference>
   </ItemGroup>
 
