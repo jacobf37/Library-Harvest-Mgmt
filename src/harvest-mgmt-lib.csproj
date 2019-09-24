@@ -21,7 +21,7 @@
     <PackageTags>LANDIS-II;Landis;Library;Harvest Management</PackageTags>
     <Description>Harvest Library for LANDIS-II</Description>
     <PackageReleaseNotes>.NET Standard 2.0 update.</PackageReleaseNotes>
-    <FileVersion>7.0</FileVersion>
+    <FileVersion>4.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Landis.Core" Version="2.0.0" />
