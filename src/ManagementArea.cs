@@ -259,9 +259,11 @@ namespace Landis.Library.HarvestManagement
                     
                     if (prescription.AnyUnharvestedStandsRankedAbove0) {
                         //Model.Core.UI.WriteLine("   Adding {0}", prescription.Prescription.Name);
+                        /*
                         foreach (StandRanking sr in prescription.Rankings) {
                             //Model.Core.UI.WriteLine("   Stand {0} ranked {1}", sr.Stand.MapCode, sr.Rank);
                         } 
+                        */
                         activePrescriptions.Add(prescription);
                     }
                 } 
