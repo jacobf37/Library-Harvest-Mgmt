@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RootNamespace>Landis.Library.HarvestManagement</RootNamespace>
     <AssemblyName>Landis.Library.HarvestManagement-v4</AssemblyName>
-    <AssemblyTitle>Landis.Library.HarvestManagement-v3</AssemblyTitle>
+    <AssemblyTitle>Landis.Library.HarvestManagement-v4</AssemblyTitle>
     <AssemblyCompany>LANDIS-II Foundation</AssemblyCompany>
     <AssemblyProduct>Landis.Library.HarvestManagement-v3</AssemblyProduct>    
     <AssemblyVersion>4.1</AssemblyVersion>
