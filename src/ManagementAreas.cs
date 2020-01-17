@@ -45,13 +45,12 @@ namespace Landis.Library.HarvestManagement
             List<uint> inactiveMgmtAreas = new List<uint>();
 
             using (map) {
-                UIntPixel pixel = map.BufferPixel;
                 foreach (Site site in Model.Core.Landscape.AllSites)
                 {
-                    map.ReadBufferPixel();
+                    UIntPixel pixel = map.ReadPixel();
                     if (site.IsActive)
                     {
-                        uint mapCode = pixel.MapCode.Value;
+                        uint mapCode = pixel.Band0;
                         ManagementArea mgmtArea = managementAreas.Find(mapCode);
                         if (mgmtArea == null) {
                             if (! inactiveMgmtAreas.Contains(mapCode))

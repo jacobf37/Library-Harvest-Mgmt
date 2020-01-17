@@ -1,16 +1,20 @@
 // This file is part of the Harvest Management library for LANDIS-II.
-
 using Landis.SpatialModeling;
 
 namespace Landis.Library.HarvestManagement
 {
-    public class UIntPixel : Pixel
+    public class UIntPixel : SingleBandPixel<uint>
     {
-        public Band<uint> MapCode  = "The numeric code for each raster cell";
-
         public UIntPixel()
+            : base()
         {
-            SetBands(MapCode);
+        }
+
+        //---------------------------------------------------------------------
+
+        public UIntPixel(ushort band0)
+            : base(band0)
+        {
         }
     }
 }

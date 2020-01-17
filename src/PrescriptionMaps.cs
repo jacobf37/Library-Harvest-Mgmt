@@ -36,24 +36,22 @@ namespace Landis.Library.HarvestManagement
         public void WriteMap(int timestep)
         {
             string path = MapNames.ReplaceTemplateVars(nameTemplate, timestep);
-            using (IOutputRaster<ShortPixel> outputRaster = Model.Core.CreateRaster<ShortPixel>(path, Model.Core.Landscape.Dimensions))
+            using (IOutputRaster<ShortPixel> outputRaster = Model.Core.CreateRaster<ShortPixel>(path, Model.Core.Landscape.Dimensions, 
+                Model.Core.LandscapeMapMetadata))
             {
-                ShortPixel pixel = outputRaster.BufferPixel;
-            
                 foreach (Site site in Model.Core.Landscape.AllSites)
                 {
                     if (site.IsActive) {
                         Prescription prescription = SiteVars.Prescription[site];
                         if (prescription == null)
-                            pixel.MapCode.Value = 1;
+                            outputRaster.WritePixel(new ShortPixel((short)1));
                         else
-                            pixel.MapCode.Value = (short)(prescription.Number + 1);
+                            outputRaster.WritePixel(new ShortPixel((short)(prescription.Number + 1)));
                     }
                     else {
                         //  Inactive site
-                        pixel.MapCode.Value = 0;
+                        outputRaster.WritePixel(new ShortPixel((short)0));
                     }
-                    outputRaster.WriteBufferPixel();
                 }
             }
         }
