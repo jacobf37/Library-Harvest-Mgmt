@@ -4,13 +4,18 @@ using Landis.SpatialModeling;
 
 namespace Landis.Library.HarvestManagement
 {
-    public class ShortPixel : Pixel
+    public class ShortPixel : SingleBandPixel<short>
     {
-        public Band<short> MapCode  = "The numeric code for each raster cell";
-
         public ShortPixel()
+            : base()
         {
-            SetBands(MapCode);
+        }
+
+        //---------------------------------------------------------------------
+
+        public ShortPixel(short band0)
+            : base(band0)
+        {
         }
     }
 }

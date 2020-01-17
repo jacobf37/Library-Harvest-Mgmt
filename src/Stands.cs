@@ -41,12 +41,10 @@ namespace Landis.Library.HarvestManagement
             }
 
             using (map) {
-                
-                UIntPixel pixel = map.BufferPixel;
                 foreach (Site site in Model.Core.Landscape.AllSites)
                 {
-                    map.ReadBufferPixel();
-                    uint mapCode = pixel.MapCode.Value;
+                    UIntPixel pixel = map.ReadPixel();
+                    uint mapCode = pixel.Band0;
                     if (site.IsActive && SiteVars.ManagementArea[site] != null)
                     {
                         if (stands.TryGetValue(mapCode, out stand)) {
