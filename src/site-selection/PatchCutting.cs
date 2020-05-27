@@ -4,6 +4,7 @@ using Landis.Utilities;
 using Landis.SpatialModeling;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 namespace Landis.Library.HarvestManagement
 {
@@ -19,7 +20,7 @@ namespace Landis.Library.HarvestManagement
         private double percent;      // percent of stand to harvest
         private double patch_size;   // harvest patch sizes
         private double areaSelected; // total area selected
-        private string priority;     // patch cutting priority (optional)
+        private bool allowOverlap;   // indicates whether or not patches can be cut that are adjacent to each other
         
         //collect all 8 relative neighbor locations in array
         private RelativeLocation[] all_neighbor_locations = new RelativeLocation[]
@@ -49,23 +50,26 @@ namespace Landis.Library.HarvestManagement
                 throw new InputValueException(size.String,
                     "Patch size cannot be negative");
         }
-
-        private static class PatchCutPriority {
-            //Names for each acceptable patch cut priority
-            public const string PatchSize = "PatchSize";    //preserve 1 cell buffer between patches; Disregard PercentCut minimum
-            public const string PercentCut = "PercentCut";  //no buffer between patches
-            public const string NoPriority = "NoPriority";  //Patch size and percent cut are equal
-        }
         
         //constructor
-        public PatchCutting(Percentage percentage, double size, string priority) {
+        public PatchCutting(Percentage percentage, double size, string allowOverlap) {
             this.percent = (double) percentage;
             this.patch_size = size;
-            if (string.IsNullOrEmpty(priority)) {
-                this.priority = PatchCutPriority.NoPriority;
+
+            if (string.IsNullOrEmpty(allowOverlap))
+            {
+                this.allowOverlap = false;
             }
-            else {
-                this.priority = priority;
+            else
+            {
+                if (allowOverlap.Equals("AllowOverlap"))
+                {
+                    this.allowOverlap = true;
+                }
+                else
+                {
+                    this.allowOverlap = false;
+                }
             }
         }
         
@@ -97,9 +101,10 @@ namespace Landis.Library.HarvestManagement
             Queue<ActiveSite> sitesToHarvest = new Queue<ActiveSite>();  // for harvesting
             Queue<ActiveSite> sitesToConsider = new Queue<ActiveSite>(); // sites to harvest
             Queue<ActiveSite> sitesConsidered = new Queue<ActiveSite>(); // all considered
+            Queue<ActiveSite> sitesToForbidAdjacency = new Queue<ActiveSite>(); // all sites harvested each patch which will be used to create borders around their neighbors
             ActiveSite crntSite;
             int random;
-            double standTargetArea;
+            double standTargetArea = Model.Core.CellArea * stand.SiteCount * percent;
 
             //get a random site from the stand
             //random = (int) (Model.Core.GenerateUniform() * 
@@ -121,8 +126,6 @@ namespace Landis.Library.HarvestManagement
             //put initial pivot site on queue
             sitesToConsider.Enqueue(crntSite);
             sites.Remove(crntSite);
-            
-            standTargetArea = Model.Core.CellArea * stand.SiteCount * percent;
             
             // loop through stand, harvesting patches of size patch_size at a time
             while (areaSelected < standTargetArea && sites.Count > 0) 
@@ -166,6 +169,8 @@ namespace Landis.Library.HarvestManagement
                             // site's neighbors dequeue the current site and 
                             // put it on the sitesToHarvest queue (used later)
                             sitesToHarvest.Enqueue(crntConsideredSite);
+
+                            sitesToForbidAdjacency.Enqueue(crntConsideredSite);
                         
                             // increment area selected and total_areaSelected
                             patchAreaSelected += Model.Core.CellArea;
@@ -186,6 +191,7 @@ namespace Landis.Library.HarvestManagement
                             stand.MinTimeSinceDamage) {
                             
                             sitesToHarvest.Enqueue(crntConsideredSite);
+                            sitesToForbidAdjacency.Enqueue(crntConsideredSite);
 
                             //increment area selected and total_areaSelected
                             patchAreaSelected += Model.Core.CellArea;
@@ -205,15 +211,38 @@ namespace Landis.Library.HarvestManagement
 
                 //Model.Core.UI.WriteLine("Done with a patch.");
 
-                //If priority is PercentCut, put the unused sitesToConsider back 
-                //into the sites list before clearing sitesToConsider
-                if (priority == PatchCutPriority.PercentCut && sitesToConsider.Count > 0)
+                // Always put the considered sites back in to the list so they can be considered again
+                if (sitesToConsider.Count > 0)
                 {
                     ActiveSite[] remainingSitesToConsider = sitesToConsider.ToArray();
                     sites.AddRange(remainingSitesToConsider);
                 }
+
+                // Create a border around each patch which will forbid its neighbors from being harvested
+                if (!allowOverlap)
+                {
+                    while (sitesToForbidAdjacency.Count > 0)
+                    {
+                        ActiveSite site = sitesToForbidAdjacency.Dequeue();
+                        foreach (RelativeLocation loc in all_neighbor_locations)
+                        {
+                            Site tempSite = site.GetNeighbor(loc);
+                            if (tempSite != null && tempSite.IsActive)
+                            {
+                                ActiveSite nbrSite = (ActiveSite)tempSite;
+
+                                // Do not cut sites which are adjacent to sites that will be harvested
+                                if (!sitesToHarvest.Contains(nbrSite))
+                                {
+                                    sites.Remove(nbrSite);
+                                }
+                            }
+                        }
+                    }
+                }
                 //clear the sitesToConsider queue to get rid of old sites
                 sitesToConsider.Clear();
+                sitesToForbidAdjacency.Clear();
                 // get a new random site to start at (one that hasn't been 
                 // put on the sitesConsidered queue yet)
                 // only allow a site-count # of tries
@@ -265,9 +294,8 @@ namespace Landis.Library.HarvestManagement
             // if the stand met the criteria for the harvest, mark it
             // as harvested otherwise add the prescription name to the
             // stands rejected prescription list
-            // if priority = PatchSize that overrides targetArea as priority for the harvest
 
-            if (areaSelected >= standTargetArea || priority == PatchCutPriority.PatchSize) {
+            if (areaSelected > 0) {
                 stand.MarkAsHarvested();
                 stand.EventId = EventId.MakeNewId();
             } else {
@@ -275,8 +303,8 @@ namespace Landis.Library.HarvestManagement
                 stand.RejectPrescriptionName(stand.PrescriptionName);
             }
 
-            // if harvest criteria met (includes priority), yield the sites, else, don't
-            if (areaSelected >= standTargetArea || priority == PatchCutPriority.PatchSize)
+            // even if patches do not reach target percentage, harvest what we can
+            if (areaSelected > 0)
             {
                 while (sitesToHarvest.Count > 0) {
                     yield return sitesToHarvest.Dequeue();

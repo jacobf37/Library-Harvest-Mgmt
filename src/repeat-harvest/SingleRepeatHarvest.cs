@@ -2,6 +2,8 @@
 
 using Landis.Library.SiteHarvest;
 using Landis.Library.Succession;
+using Landis.SpatialModeling;
+using System;
 
 namespace Landis.Library.HarvestManagement
 {
@@ -13,12 +15,12 @@ namespace Landis.Library.HarvestManagement
     public class SingleRepeatHarvest
         : RepeatHarvest
     {
-        private ICohortCutter initialCohortSelector;
+        private ICohortCutter initialCohortCutter;
         private Planting.SpeciesList initialSpeciesToPlant;
+        private ISiteSelector initialSiteSelector;
 
         private ICohortCutter additionalCohortCutter;
         private Planting.SpeciesList additionalSpeciesToPlant;
-        private ISiteSelector additionalSiteSelector;
 
         //---------------------------------------------------------------------
 
@@ -29,20 +31,19 @@ namespace Landis.Library.HarvestManagement
                                    Planting.SpeciesList speciesToPlant,
                                    ICohortCutter        additionalCohortCutter,
                                    Planting.SpeciesList additionalSpeciesToPlant,
-                                   ISiteSelector        additionalSiteSelector,
                                    int                  minTimeSinceDamage,
                                    bool                 preventEstablishment,
                                    int                  interval)
             : base(name, rankingMethod, siteSelector, cohortCutter, speciesToPlant,
-                   additionalSiteSelector, minTimeSinceDamage, preventEstablishment,
-                   interval)
+                   minTimeSinceDamage, preventEstablishment, interval)
         {
-            this.initialCohortSelector = cohortCutter;
+            this.initialCohortCutter = cohortCutter;
+            this.initialSiteSelector = SiteSelector;
             this.initialSpeciesToPlant = speciesToPlant;
 
             this.additionalCohortCutter = additionalCohortCutter;
             this.additionalSpeciesToPlant = additionalSpeciesToPlant;
-            this.additionalSiteSelector = additionalSiteSelector;
+            this.isSingleRepeatPrescription = true;
         }
 
         //---------------------------------------------------------------------
@@ -59,17 +60,23 @@ namespace Landis.Library.HarvestManagement
             if (stand.IsSetAside) {
                 CohortCutter = additionalCohortCutter;
                 SpeciesToPlant = additionalSpeciesToPlant;
-                SiteSelector = additionalSiteSelector; // new CompleteStand();
                 //
                 //if(this.SiteSelectionMethod.GetType() == Landis.Extension.BiomassHarvest.PartialStandSpreading)
                 //  SiteSelector = BiomassHarvest.WrapSiteSelector(SiteSelector);
-                
+                this.IsSingleRepeatStep = true;
             }
             else {
-                CohortCutter = initialCohortSelector;
+                CohortCutter = initialCohortCutter;
                 SpeciesToPlant = initialSpeciesToPlant;
             }
             base.Harvest(stand);
+
+            // Unmark specific cells that were set aside
+            if (stand.IsSetAside)
+            {
+                stand.ClearSetAsideSites(this.Name);
+                this.IsSingleRepeatStep = false;
+            }
 
             return; 
         }

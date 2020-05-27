@@ -1,9 +1,7 @@
 ﻿// This file is part of the Harvest Management library for LANDIS-II.
 
 using Landis.Core;
-//using Landis.Library.AgeOnlyCohorts;
-using Landis.Library.BiomassCohorts;
-using Landis.Library.Biomass;
+using Landis.Library.AgeOnlyCohorts;
 using Landis.SpatialModeling;
 
 namespace Landis.Library.HarvestManagement
@@ -73,6 +71,11 @@ namespace Landis.Library.HarvestManagement
         /// </summary>
         public static ISiteVar<bool> LandUseAllowHarvest { get; private set; }
 
+        /// <summary>
+        /// Keeps track of the biomass lost from each site
+        /// </summary>
+        public static ISiteVar<double> BiomassRemoved { get; set; }
+
         //---------------------------------------------------------------------
 
         /// <summary>
@@ -80,9 +83,7 @@ namespace Landis.Library.HarvestManagement
         /// </summary>
         public static void Initialize()
         {
-            //Cohorts = Model.Core.GetSiteVar<ISiteCohorts>("Succession.AgeCohorts");
-
-            Cohorts = Model.Core.GetSiteVar<Landis.Library.BiomassCohorts.ISiteCohorts>("Succession.BiomassCohorts");
+            Cohorts = Model.Core.GetSiteVar<ISiteCohorts>("Succession.AgeCohorts");
 
             ManagementArea   = Model.Core.Landscape.NewSiteVar<ManagementArea>();
             Stand            = Model.Core.Landscape.NewSiteVar<Stand>();
@@ -90,6 +91,7 @@ namespace Landis.Library.HarvestManagement
             PrescriptionName = Model.Core.Landscape.NewSiteVar<string>();
             CohortsDamaged   = Model.Core.Landscape.NewSiteVar<int>();
             TimeOfLastEvent  = Model.Core.Landscape.NewSiteVar<int>();
+            BiomassRemoved = Model.Core.Landscape.NewSiteVar<double>();
 
             Model.Core.RegisterSiteVar(SiteVars.PrescriptionName, "Harvest.PrescriptionName");
             //Model.Core.RegisterSiteVar(SiteVars.Prescription, "Harvest.PrescriptionName");

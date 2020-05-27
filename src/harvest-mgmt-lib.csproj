@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>Landis.Library.HarvestManagement</RootNamespace>
-    <AssemblyName>Landis.Library.HarvestManagement-v3-Biomass</AssemblyName>
-    <AssemblyTitle>Landis.Library.HarvestManagement-v3</AssemblyTitle>
+    <AssemblyName>Landis.Library.HarvestManagement-v4-Biomass</AssemblyName>
+    <AssemblyTitle>Landis.Library.HarvestManagement-v4</AssemblyTitle>
+    <AssemblyVersion>4.0</AssemblyVersion>
+    <Version>4.0</Version> 
     <AssemblyCompany>LANDIS-II Foundation</AssemblyCompany>
     <AssemblyProduct>Landis.Library.HarvestManagement-v3</AssemblyProduct>    
-    <AssemblyVersion>3.0</AssemblyVersion>
     <AssemblyDescription>Harvest Library for LANDIS-II</AssemblyDescription>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -17,7 +18,6 @@
     <Authors>Landis-II-Foundation</Authors>         
     <Product>Harvest Library</Product>
     <Copyright>LANDIS-II Foundation</Copyright>   
-    <Version>3.0</Version> 
     <PackageTags>LANDIS-II;Landis;Library;Harvest Management</PackageTags>
     <Description>Harvest Library for LANDIS-II</Description>
     <PackageReleaseNotes>.NET Standard 2.0 update.</PackageReleaseNotes>
@@ -44,7 +44,7 @@
     <Reference Include="Landis.Library.SiteHarvest-v2">
       <HintPath>lib\Landis.Library.SiteHarvest-v2.dll</HintPath>
     </Reference>
-    <Reference Include="Landis.Library.Succession-v7">
+    <Reference Include="Landis.Library.Succession-v8">
       <HintPath>lib\Landis.Library.Succession-v7.dll</HintPath>
     </Reference>
   </ItemGroup>

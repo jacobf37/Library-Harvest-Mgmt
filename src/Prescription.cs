@@ -27,6 +27,9 @@ namespace Landis.Library.HarvestManagement
         private int minTimeSinceDamage;
         private bool preventEstablishment;
         private CohortCounts cohortCounts;
+        private bool isSingleRepeatStep;
+        protected bool isSingleRepeatPrescription;
+        private int repeatNumber = 0;
         
         //---------------------------------------------------------------------
 
@@ -41,6 +44,21 @@ namespace Landis.Library.HarvestManagement
         {
             get {
                 return number;
+            }
+        }
+
+        /// <summary>
+        /// Indicates if the prescription is performing the final harvest for single repeat prescriptions
+        /// </summary>
+        public bool IsSingleRepeatStep
+        {
+            set
+            {
+                isSingleRepeatStep = value;
+            }
+            get
+            {
+                return isSingleRepeatStep;
             }
         }
 
@@ -117,6 +135,10 @@ namespace Landis.Library.HarvestManagement
             {
                 siteSelector = value;
             }
+            get
+            {
+                return siteSelector;
+            }
         }
         //---------------------------------------------------------------------
 
@@ -182,6 +204,8 @@ namespace Landis.Library.HarvestManagement
             this.speciesToPlant = speciesToPlant;
             this.minTimeSinceDamage = minTimeSinceDamage;
             this.preventEstablishment = preventEstablishment;
+            this.isSingleRepeatStep = false;
+            this.isSingleRepeatPrescription = false;
 
             cohortCounts = new CohortCounts();
         }
@@ -215,50 +239,76 @@ namespace Landis.Library.HarvestManagement
             // SelectSites(stand) is where either complete, complete stand spreading, or partial stand
             // spreading are activated.
             // tjs - This is what gets the sites that will be harvested
-           
-
-            foreach (ActiveSite site in siteSelector.SelectSites(stand))
-            {
-                // Site selection may have spread to other stands beyond the
-                // original stand.
-                Stand standForCurrentSite = SiteVars.Stand[site];
-                
-                // Always record the prescription even if nothing harvested; Supports plantOnly prescriptions
-                SiteVars.Prescription[site] = this;
-                SiteVars.PrescriptionName[site] = this.Name;
-
-
-                if (isDebugEnabled)
-                    log.DebugFormat("  Cutting cohorts at {0} in stand {1}{2}", site,
-                                    SiteVars.Stand[site].MapCode,
-                                    (standForCurrentSite == stand)
-                                        ? ""
-                                        : string.Format(" (initial stand {0})",
-                                                        stand.MapCode));
-                cohortCutter.Cut(site, cohortCounts);
-
-                if (cohortCounts.AllSpecies > 0)
-                {
-                    SiteVars.CohortsDamaged[site] = cohortCounts.AllSpecies;
-                    standForCurrentSite.DamageTable.IncrementCounts(cohortCounts);
-                    stand.LastAreaHarvested += Model.Core.CellArea;
-                    if (isDebugEnabled)
-                        log.DebugFormat("    # of cohorts damaged = {0}; stand.LastAreaHarvested = {1}",
-                                        SiteVars.CohortsDamaged[site],
-                                        stand.LastAreaHarvested);
-                    HarvestExtensionMain.OnSiteHarvest(this, site);
-                }
-                
-
-                if (speciesToPlant != null)
-                {
-
-                    Model.Core.UI.WriteLine("  {0} {1}",speciesToPlant.ToString(), site.ToString());
-                    Reproduction.ScheduleForPlanting(speciesToPlant, site);
-                }
             
-            } 
+            if (isSingleRepeatStep)
+            {
+                foreach (ActiveSite site in stand)
+                {
+                    // Check if this was previously harvested in the last step
+                    if (stand.IsSiteSetAside(site, this.Name))
+                    {
+                        HarvestSite(site, stand);
+                    }
+                }
+            }
+            else
+            {
+                foreach (ActiveSite site in SiteSelector.SelectSites(stand))
+                {
+                    HarvestSite(site, stand);
+
+                    // Only queue up for a repeat harvest if cohorts were cut
+                    if (this.isSingleRepeatPrescription && cohortCounts.AllSpecies > 0)
+                    {
+                        stand.SetSiteAside(site, this.Name);
+                    }
+                }
+            }
             return; 
-        } 
+        }
+
+        /// <summary>
+        /// Does the actual work of harvesting individual sites
+        /// </summary>
+        public void HarvestSite(ActiveSite site, Stand stand)
+        {
+            // Site selection may have spread to other stands beyond the
+            // original stand.
+            Stand standForCurrentSite = SiteVars.Stand[site];
+
+            // Always record the prescription even if nothing harvested; Supports plantOnly prescriptions
+            SiteVars.Prescription[site] = this;
+            SiteVars.PrescriptionName[site] = this.Name;
+
+            if (isDebugEnabled)
+                log.DebugFormat("  Cutting cohorts at {0} in stand {1}{2}", site,
+                                SiteVars.Stand[site].MapCode,
+                                (standForCurrentSite == stand)
+                                    ? ""
+                                    : string.Format(" (initial stand {0})",
+                                                    stand.MapCode));
+            cohortCutter.Cut(site, cohortCounts);
+
+            if (cohortCounts.AllSpecies > 0)
+            {
+                SiteVars.CohortsDamaged[site] = cohortCounts.AllSpecies;
+                standForCurrentSite.DamageTable.IncrementCounts(cohortCounts);
+                stand.LastAreaHarvested += Model.Core.CellArea;
+                if (isDebugEnabled)
+                    log.DebugFormat("    # of cohorts damaged = {0}; stand.LastAreaHarvested = {1}",
+                                    SiteVars.CohortsDamaged[site],
+                                    stand.LastAreaHarvested);
+                HarvestExtensionMain.OnSiteHarvest(this, site);
+            }
+
+            if (speciesToPlant != null)
+            {
+                if (isDebugEnabled)
+                {
+                    Model.Core.UI.WriteLine("  {0} {1}", speciesToPlant.ToString(), site.ToString());
+                }
+                Reproduction.ScheduleForPlanting(speciesToPlant, site);
+            }
+        }
     }
 }

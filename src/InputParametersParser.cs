@@ -6,6 +6,7 @@ using Landis.Library.SiteHarvest;
 using Landis.Library.Succession;
 using System.Collections.Generic;
 using System.Text;
+using System;
 
 using FormatException = System.FormatException;
 
@@ -47,7 +48,7 @@ namespace Landis.Library.HarvestManagement
             public const string ForestTypeTable = "ForestTypeTable";
             public const string StandAdjacency = "StandAdjacency";
             public const string PresalvageYears = "PresalvageYears";
-            public const string MinimumBiomass = "MinimumBiomass";
+            public const string TimesToRepeat = "TimesToRepeat";
         }
 
         //---------------------------------------------------------------------
@@ -206,6 +207,7 @@ namespace Landis.Library.HarvestManagement
 
             InputVar<int> singleRepeat = new InputVar<int>(Names.SingleRepeat);
             InputVar<int> multipleRepeat = new InputVar<int>(Names.MultipleRepeat);
+            InputVar<int> timesToRepeat = new InputVar<int>(Names.TimesToRepeat);
 
             int nameLineNumber = LineNumber;
             InputVar<string> prescriptionName = new InputVar<string>(Names.Prescription);
@@ -245,6 +247,7 @@ namespace Landis.Library.HarvestManagement
 
                 //  Repeat harvest?
                 int repeatParamLineNumber = LineNumber;
+                string currentLine = this.CurrentLine;
                 if (ReadOptionalVar(singleRepeat)) {
                     int interval = ValidateRepeatInterval(singleRepeat.Value,
                                                           repeatParamLineNumber,
@@ -252,7 +255,6 @@ namespace Landis.Library.HarvestManagement
                     ICohortSelector additionalCohortSelector = ReadCohortSelector(true);
                     ICohortCutter additionalCohortCutter = CreateAdditionalCohortCutter(additionalCohortSelector);
                     Planting.SpeciesList additionalSpeciesToPlant = ReadSpeciesToPlant();
-                    ISiteSelector additionalSiteSelector = new CompleteStand();
                     prescriptions.Add(new SingleRepeatHarvest(name,
                                                               rankingMethod,
                                                               siteSelector,
@@ -260,7 +262,6 @@ namespace Landis.Library.HarvestManagement
                                                               speciesToPlant,
                                                               additionalCohortCutter,
                                                               additionalSpeciesToPlant,
-                                                              additionalSiteSelector,
                                                               minTimeSinceDamage,
                                                               preventEstablishment,
                                                               interval));
@@ -269,16 +270,39 @@ namespace Landis.Library.HarvestManagement
                     int interval = ValidateRepeatInterval(multipleRepeat.Value,
                                                           repeatParamLineNumber,
                                                           harvestTimestep);
-                    ISiteSelector additionalSiteSelector = new CompleteStand();
-                    prescriptions.Add(new RepeatHarvest(name,
+
+                    bool repeatSet = ReadOptionalVar(timesToRepeat);
+                    if (repeatSet)
+                    {
+                        if (timesToRepeat.Value == 0)
+                        {
+                            throw new Exception("Multiple Repeat requires repeats.");
+                        }
+                        else if (timesToRepeat.Value == 1)
+                        {
+                            throw new Exception("Multiple Repeat requires more than one repeat, use Single Repeat instead.");
+                        }
+                        prescriptions.Add(new RepeatHarvest(name,
                                                         rankingMethod,
                                                         siteSelector,
                                                         cohortCutter,
                                                         speciesToPlant,
-                                                        additionalSiteSelector,
+                                                        minTimeSinceDamage,
+                                                        preventEstablishment,
+                                                        interval,
+                                                        timesToRepeat.Value));
+                    }
+                    else
+                    {
+                        prescriptions.Add(new RepeatHarvest(name,
+                                                        rankingMethod,
+                                                        siteSelector,
+                                                        cohortCutter,
+                                                        speciesToPlant,
                                                         minTimeSinceDamage,
                                                         preventEstablishment,
                                                         interval));
+                    }
                 }
                 else {
                     prescriptions.Add(new Prescription(name,
@@ -317,13 +341,18 @@ namespace Landis.Library.HarvestManagement
                 rankingMethod = new RegulateAgesRank();
             else if (rankingName.Value.Actual == "FireHazard")
                 rankingMethod = new FireRiskRank(ReadFireRiskTable());
-            else if (rankingName.Value.Actual == "MinimumBiomass")
-                rankingMethod = new MinimumBiomassRank();
             else if (rankingName.Value.Actual == "TimeSinceDisturbance")
             {
                 rankingMethod = new TimeSinceDisturbanceRank();
                 check = true;
             }
+
+            ////list of ranking methods which have not been implemented yet
+            //else if ((rankingName.Value.Actual == "SpeciesBiomass") ||
+            //        (rankingName.Value.Actual == "TotalBiomass")) {
+            //    throw new InputValueException(rankingName.Value.String,
+            //                                  rankingName.Value.String + " is not implemented yet");
+            //}
 
             else
             {
@@ -333,8 +362,7 @@ namespace Landis.Library.HarvestManagement
                                                    "  Random",
                                                    "  RegulateAges",
                                                    "  FireRisk",
-                                                   "  TimeSinceDisturbance",
-                                                   "  MinimumBiomass"};
+                                                   "  TimeSinceDisturbance"};
                 throw new InputValueException(rankingName.Value.String,
                                               rankingName.Value.String + " is not a valid stand ranking",
                                               new MultiLineText(methodList));
@@ -371,18 +399,6 @@ namespace Landis.Library.HarvestManagement
                 //add the maximumAge ranking requirement to this ranking method.
                 rankingMethod.AddRequirement(new MaximumAge(maxAge));
             }
-
-            // RMS TESTING 3/19*******************************************************
-            InputVar<ushort> minBio = new InputVar<ushort>("MinimumBiomass");
-            if (ReadOptionalVar(minBio))
-            {
-                reqs = true;
-                //get the firetime
-                ushort agb = minBio.Value.Actual;
-                //add the firetime ranking requirement to this ranking method.
-                rankingMethod.AddRequirement(new MinimumBiomass(agb));
-            }
-            // RMS TESTING*******************************************************
 
             InputVar<ushort> firetime = new InputVar<ushort>("TimeSinceLastFire");
             if (ReadOptionalVar(firetime))
@@ -473,8 +489,7 @@ namespace Landis.Library.HarvestManagement
                 Names.MinTimeSinceDamage,
                 Names.StandAdjacency,
                 Names.timeSinceLastFire,
-                Names.timeSinceLastWind,
-                Names.MinimumBiomass
+                Names.timeSinceLastWind
 
             }
         );
@@ -750,15 +765,16 @@ namespace Landis.Library.HarvestManagement
                 ReadValue(size, reader);
                 PatchCutting.ValidateSize(size.Value);
 
-                // priority is an optional value so we can't use ReadValue
+                string allowOverlap = string.Empty;
                 TextReader.SkipWhitespace(reader);
                 index = reader.Index;
-                string priority = TextReader.ReadWord(reader);
+                allowOverlap = TextReader.ReadWord(reader);
+                selector = new PatchCutting(percentage.Value.Actual, size.Value.Actual, allowOverlap);
 
-                selector = new PatchCutting(percentage.Value.Actual, size.Value.Actual, priority);
+
                 valueAsStr.AppendFormat(" {0} {1} {2}", percentage.Value.String,
                                                     size.Value.String,
-                                                    priority);
+                                                    allowOverlap);
             }
 
             else {
