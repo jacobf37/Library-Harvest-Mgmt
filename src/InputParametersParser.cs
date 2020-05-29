@@ -48,6 +48,7 @@ namespace Landis.Library.HarvestManagement
             public const string ForestTypeTable = "ForestTypeTable";
             public const string StandAdjacency = "StandAdjacency";
             public const string PresalvageYears = "PresalvageYears";
+            public const string MinimumBiomass = "MinimumBiomass";
             public const string TimesToRepeat = "TimesToRepeat";
         }
 
@@ -341,18 +342,13 @@ namespace Landis.Library.HarvestManagement
                 rankingMethod = new RegulateAgesRank();
             else if (rankingName.Value.Actual == "FireHazard")
                 rankingMethod = new FireRiskRank(ReadFireRiskTable());
+            else if (rankingName.Value.Actual == "MinimumBiomass")
+                rankingMethod = new MinimumBiomassRank();
             else if (rankingName.Value.Actual == "TimeSinceDisturbance")
             {
                 rankingMethod = new TimeSinceDisturbanceRank();
                 check = true;
             }
-
-            ////list of ranking methods which have not been implemented yet
-            //else if ((rankingName.Value.Actual == "SpeciesBiomass") ||
-            //        (rankingName.Value.Actual == "TotalBiomass")) {
-            //    throw new InputValueException(rankingName.Value.String,
-            //                                  rankingName.Value.String + " is not implemented yet");
-            //}
 
             else
             {
@@ -362,11 +358,13 @@ namespace Landis.Library.HarvestManagement
                                                    "  Random",
                                                    "  RegulateAges",
                                                    "  FireRisk",
-                                                   "  TimeSinceDisturbance"};
+                                                   "  TimeSinceDisturbance",
+                                                   "  MinimumBiomass"};
                 throw new InputValueException(rankingName.Value.String,
                                               rankingName.Value.String + " is not a valid stand ranking",
                                               new MultiLineText(methodList));
             }
+
 
             //  Read optional ranking requirements
             InputVar<ushort> presalvageYears = new InputVar<ushort>("PresalvageYears");
@@ -399,6 +397,18 @@ namespace Landis.Library.HarvestManagement
                 //add the maximumAge ranking requirement to this ranking method.
                 rankingMethod.AddRequirement(new MaximumAge(maxAge));
             }
+
+            // RMS TESTING 3/19*******************************************************
+            InputVar<ushort> minBio = new InputVar<ushort>("MinimumBiomass");
+            if (ReadOptionalVar(minBio))
+            {
+                reqs = true;
+                //get the firetime
+                ushort agb = minBio.Value.Actual;
+                //add the firetime ranking requirement to this ranking method.
+                rankingMethod.AddRequirement(new MinimumBiomass(agb));
+            }
+            // RMS TESTING*******************************************************
 
             InputVar<ushort> firetime = new InputVar<ushort>("TimeSinceLastFire");
             if (ReadOptionalVar(firetime))
@@ -433,7 +443,7 @@ namespace Landis.Library.HarvestManagement
                 if (adjacencyType.Value.String != "StandAge" && adjacencyType.Value.String != "TimeSinceLastHarvested") {
                     string[] methodList = new string[]{"AdjacencyType methods:",
                                                        "    StandAge",
-                                                       "    TimeSinceLastHarvested"};
+                                                       "    TimeSinceLastHarvested",};
                     throw new InputValueException(adjacencyType.Value.String,
                                                   adjacencyType.Value.String + " is not a valid site selection method",
                                                   new MultiLineText(methodList));
@@ -489,7 +499,8 @@ namespace Landis.Library.HarvestManagement
                 Names.MinTimeSinceDamage,
                 Names.StandAdjacency,
                 Names.timeSinceLastFire,
-                Names.timeSinceLastWind
+                Names.timeSinceLastWind,
+                Names.MinimumBiomass
 
             }
         );

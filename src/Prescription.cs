@@ -29,7 +29,7 @@ namespace Landis.Library.HarvestManagement
         private CohortCounts cohortCounts;
         private bool isSingleRepeatStep;
         protected bool isSingleRepeatPrescription;
-        private int repeatNumber = 0;
+        //private int repeatNumber = 0;
         
         //---------------------------------------------------------------------
 
