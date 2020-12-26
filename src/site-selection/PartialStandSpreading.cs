@@ -4,6 +4,7 @@ using Landis.Utilities;
 using Landis.SpatialModeling;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Landis.Library.HarvestManagement
 {
@@ -12,7 +13,8 @@ namespace Landis.Library.HarvestManagement
     /// size is reached.
     /// </summary>
     public class PartialStandSpreading
-        : StandSpreading, ISiteSelector, IEnumerable<ActiveSite> {
+        : StandSpreading, ISiteSelector, IEnumerable<ActiveSite>
+    {
         private Stand initialStand;
         private double minTargetSize;
         private double maxTargetSize;
@@ -20,7 +22,7 @@ namespace Landis.Library.HarvestManagement
 
         private Queue<ActiveSite> harvestableSites;  // Sites to harvest
         Queue<Stand> standsToHarvest;                // Stands to harvest
-        Queue<double>standsToHarvestRankings;        // Stands to harvest rankings
+        Queue<double> standsToHarvestRankings;        // Stands to harvest rankings
         List<Stand> standsToReject;                  // Stands to mark as rejected
         private int minTimeSinceDamage;              // From prescription
 
@@ -49,29 +51,34 @@ namespace Landis.Library.HarvestManagement
         /// <param name="maxTargetSize">
         /// The max size (area) to harvest.  Units: hectares
         /// </param>
-        public PartialStandSpreading(double minTargetSize, double maxTargetSize) {
+        public PartialStandSpreading(double minTargetSize, double maxTargetSize)
+        {
             this.minTargetSize = minTargetSize;
             this.maxTargetSize = maxTargetSize;
         }
 
         //---------------------------------------------------------------------
 
-        double ISiteSelector.AreaSelected {
-            get {
+        double ISiteSelector.AreaSelected
+        {
+            get
+            {
                 return areaSelected;
             }
         }
 
         //---------------------------------------------------------------------
 
-        IEnumerable<ActiveSite> ISiteSelector.SelectSites(Stand stand) {
+        IEnumerable<ActiveSite> ISiteSelector.SelectSites(Stand stand)
+        {
             initialStand = stand;
             return this;
         }
 
         //---------------------------------------------------------------------
 
-        IEnumerator<ActiveSite> IEnumerable<ActiveSite>.GetEnumerator() {
+        IEnumerator<ActiveSite> IEnumerable<ActiveSite>.GetEnumerator()
+        {
 
             // harvestable sites are thos sites that will be harvested if
             // the minTargetSize is reached
@@ -97,29 +104,38 @@ namespace Landis.Library.HarvestManagement
             this.HarvestedNeighbors.Clear();
 
             // Attempt to do the harvest
-            if (SpreadFromStand(initialStand)) {
+            if (SpreadFromStand(initialStand))
+            {
                 int eventId = EventId.MakeNewId();
 
                 // loop through all harvestable stands and update
                 // appropriate items
-                foreach (Stand standToHarvest in standsToHarvest) {
+                foreach (Stand standToHarvest in standsToHarvest)
+                {
                     standToHarvest.MarkAsHarvested();
                     standToHarvest.EventId = eventId;
                     standToHarvest.PrescriptionName = prescriptionName;
                     standToHarvest.LastPrescription = lastPrescription;
                     standToHarvest.MinTimeSinceDamage = minTimeSinceDamage;
                     standToHarvest.HarvestedRank = standsToHarvestRankings.Dequeue();
-                    if(!(standToHarvest==initialStand))
+                    if (!(standToHarvest == initialStand))
                         this.HarvestedNeighbors.Add(standToHarvest);
                 } // foreach(Stand standToHarvest in standsToHarvest)
 
-            } else {
+            }
+            else
+            {
 
                 // if this set of stands is not harvestable by this prescription
                 // mark them all as such using the prescriptionName.
 
-                foreach (Stand standToReject in standsToHarvest) {
+                foreach (Stand standToReject in standsToHarvest)
+                {
                     //Model.Core.UI.WriteLine("Rejecting stand {0} for prescription {1}",standToReject.MapCode, prescriptionName);
+
+                    // Remove enqueued sites - their stands are all rejected
+                    harvestableSites.Clear();
+
                     standToReject.RejectPrescriptionName(prescriptionName);
                     standToReject.HarvestedRank = standsToHarvestRankings.Dequeue();
                 } // foreach(Stand standToReject in standsToHarvest)
@@ -129,56 +145,60 @@ namespace Landis.Library.HarvestManagement
             // mark all rejected stands as rejected for this
             // prescription name
 
-            foreach (Stand standToReject in standsToReject) {
+            foreach (Stand standToReject in standsToReject)
+            {
                 //Model.Core.UI.WriteLine("Rejecting stand {0} for prescription {1}",standToReject.MapCode, prescriptionName);
                 standToReject.RejectPrescriptionName(prescriptionName);
             }
 
             // If what was found is enough to harvest, yield it
-            if (harvestableSites.Count >= minTargetSize) {
-                while (harvestableSites.Count > 0) {
+            if (harvestableSites.Count >= minTargetSize)
+            {
+                while (harvestableSites.Count > 0)
+                {
                     yield return harvestableSites.Dequeue();
                 }
             }
 
         } // IEnumerator<ActiveSite> IEnumerable<ActiveSite>.GetEnumerator()
 
-        private static ActiveSite GetNeighboringSite(List<Stand> harvestedNeighbors, Stand neighborStand) 
+        private static ActiveSite GetNeighboringSite(List<Stand> harvestedNeighbors, Stand neighborStand)
         {
             // get a shared-edge site from any one of the previously harvested neighboring stands
             // tjs - changed to allow a null return. Sometimes there are not adjacent sites
             ActiveSite returnSite;
 
-            foreach (Site current_site in neighborStand) 
+            foreach (Site current_site in neighborStand)
             {
                 //check if one of its neighbors is on the edge of the initialStand
-                foreach (RelativeLocation relloc in all_neighbor_locations) 
+                foreach (RelativeLocation relloc in all_neighbor_locations)
                 {
 
                     //if it's a valid site and is on the edge
-                    if (current_site.GetNeighbor(relloc) != null && current_site.GetNeighbor(relloc).IsActive) 
+                    if (current_site.GetNeighbor(relloc) != null && current_site.GetNeighbor(relloc).IsActive)
                     {
-                        foreach (Stand stand in harvestedNeighbors) 
+                        foreach (Stand stand in harvestedNeighbors)
                         {
                             if (SiteVars.Stand[current_site.GetNeighbor(relloc)] == stand)
                             {
-                                returnSite = (ActiveSite) current_site;
+                                returnSite = (ActiveSite)current_site;
                                 return returnSite;
                             }
-                        } 
-                    } 
+                        }
+                    }
                 }
 
-            } 
+            }
 
-            return new ActiveSite();         
-        } 
+            return new ActiveSite();
+        }
 
         //--------------------------------------------------------------
 
         // For the starting stand do partial stand spreading until either
         // we run out of stands or we have our target area
-        private bool SpreadFromStand(Stand startingStand) {
+        private bool SpreadFromStand(Stand startingStand)
+        {
 
             List<Stand> standsConsidered = new List<Stand>();
             // a list of every stand we have thought about considering
@@ -192,16 +212,16 @@ namespace Landis.Library.HarvestManagement
 
             // If we have a valid starting stand, put it on the list to
             // consider
-            if(startingStand != null && !startingStand.IsSetAside) 
+            if (startingStand != null && !startingStand.IsSetAside)
             {
-                standsToConsiderRankings.Insert(0,GetRanking(startingStand));
+                standsToConsiderRankings.Insert(0, GetRanking(startingStand));
                 standsToConsiderAll.Add(startingStand);
             }
 
             while (standsToConsiderRankings.Count > 0 &&
                 standsToConsiderRankings[0].Rank > 0 &&
-                areaSelected < maxTargetSize) 
-                {
+                areaSelected < maxTargetSize)
+            {
 
                 // Get the stand to work with for this loop iteration
                 crntStand = standsToConsiderRankings[0].Stand;
@@ -209,60 +229,67 @@ namespace Landis.Library.HarvestManagement
                 standsToConsiderRankings.RemoveAt(0);
 
                 // If the stand is not set aside, Get the starting site
-                if (!crntStand.IsSetAside) 
+                if (!crntStand.IsSetAside)
                 {
                     // first stand starts at a random site, subsequent
                     // stands start at an adjoining site
-                    if (standsConsidered.Count == 0) 
+                    if (standsConsidered.Count == 0)
                     {
                         startingSite = crntStand.GetRandomActiveSite;
-                    } else {
+                    }
+                    else
+                    {
                         startingSite = GetNeighboringSite(standsConsidered, crntStand);
-                        if (startingSite == false) 
+                        if (startingSite == false)
                         {
                             standsToReject.Add(crntStand);
                             continue;
                         }
                     }
-                } else {
+                }
+                else
+                {
                     // if the stand is set aside, it doesn't get processed
                     // and its neighbors don't go on the stand list
                     standsToReject.Add(crntStand);
                     continue;
-                } 
+                }
 
                 // Enqueue the eligible sites and put the stand
                 // on the appropriate queue(s)
-                if (EnqueueEligibleSites(startingSite, crntStand)) 
+                if (EnqueueEligibleSites(startingSite, crntStand))
                 {
                     standsToHarvest.Enqueue(crntStand);
                     standsToHarvestRankings.Enqueue(crntRank);
-                } else {
+                }
+                else
+                {
                     standsToReject.Add(crntStand);
                 }
 
                 standsConsidered.Add(crntStand);
 
-                if (areaSelected < maxTargetSize) {
+                if (areaSelected < maxTargetSize)
+                {
 
                     // Get the neighbors and put them on the
                     // standsToConsider queue
 
-                    foreach (Stand neighbor in crntStand.Neighbors) 
+                    foreach (Stand neighbor in crntStand.Neighbors)
                     {
-                        if(!standsConsidered.Contains(neighbor) &&
+                        if (!standsConsidered.Contains(neighbor) &&
                             !standsToConsiderAll.Contains(neighbor) &&
-                            !neighbor.Harvested) 
+                            !neighbor.Harvested)
                         {
                             StandRanking neighborRanking = GetRanking(neighbor);
                             standsToConsiderAll.Add(neighbor);
-                            if (neighborRanking.Rank <= 0) 
+                            if (neighborRanking.Rank <= 0)
                             {
                                 continue;
                             }
 
                             int i;
-                            for (i = 0; i < standsToConsiderRankings.Count; i++) 
+                            for (i = 0; i < standsToConsiderRankings.Count; i++)
                             {
                                 if (standsToConsiderRankings[i].Rank < neighborRanking.Rank)
                                     break;
@@ -270,12 +297,12 @@ namespace Landis.Library.HarvestManagement
 
                             standsToConsiderRankings.Insert(i, neighborRanking);
 
-                        } 
-                    } 
+                        }
+                    }
 
-                } 
+                }
 
-            } 
+            }
 
             // If we found enough to meet our goal, return true,
             // otherwise return the default of false.
@@ -283,13 +310,13 @@ namespace Landis.Library.HarvestManagement
                 rtrnVal = true;
 
             return rtrnVal;
-        } 
+        }
 
         //--------------------------------------------------------------
 
         // For the current stand, enqueue all the eligible sites onto
         // the harvestableSites queue
-        private bool EnqueueEligibleSites(ActiveSite startingSite, Stand crntStand) 
+        private bool EnqueueEligibleSites(ActiveSite startingSite, Stand crntStand)
         {
             Queue<ActiveSite> sitesConsidered = new Queue<ActiveSite>();
             Queue<ActiveSite> sitesToConsider = new Queue<ActiveSite>();
@@ -299,13 +326,13 @@ namespace Landis.Library.HarvestManagement
 
             //The following case could happen if prevent establishment
             //generates empty stands.
-            if (crntStand.GetActiveSites().Count <= 0)  
+            if (crntStand.GetActiveSites().Count <= 0)
                 return false;
 
             if (crntSite != null)
                 sitesToConsider.Enqueue(crntSite);
 
-            while (sitesToConsider.Count > 0 && areaSelected < maxTargetSize) 
+            while (sitesToConsider.Count > 0 && areaSelected < maxTargetSize)
             {
 
                 // Get the site to work with for this loop iteration
@@ -313,7 +340,7 @@ namespace Landis.Library.HarvestManagement
 
                 // Enqueue and increment area if sight is harvestable
                 sitesConsidered.Enqueue(crntSite);
-                if (SiteVars.TimeSinceLastDamage(crntSite) >= minTimeSinceDamage) 
+                if (SiteVars.TimeSinceLastDamage(crntSite) >= minTimeSinceDamage)
                 {
                     harvestableSites.Enqueue(crntSite);
                     areaSelected += Model.Core.CellArea;
@@ -321,41 +348,42 @@ namespace Landis.Library.HarvestManagement
                 }
 
                 // Put those neighbors on the sightsToConsider queue
-                foreach (RelativeLocation loc in all_neighbor_locations) 
+                foreach (RelativeLocation loc in all_neighbor_locations)
                 {
                     // get a neighbor site
                     Site tempSite = crntSite.GetNeighbor(loc);
-                    if(tempSite != null && tempSite.IsActive)
+                    if (tempSite != null && tempSite.IsActive)
                     {
-                    //get a neighbor site (if it's active and non-null)
-                    //if (crntSite.GetNeighbor(loc) != null && crntSite.GetNeighbor(loc).IsActive) 
-                    //{
-                        ActiveSite neighborSite = (ActiveSite) tempSite; // (ActiveSite)crntSite.GetNeighbor(loc);
+                        //get a neighbor site (if it's active and non-null)
+                        //if (crntSite.GetNeighbor(loc) != null && crntSite.GetNeighbor(loc).IsActive) 
+                        //{
+                        ActiveSite neighborSite = (ActiveSite)tempSite; // (ActiveSite)crntSite.GetNeighbor(loc);
 
                         // check if in the same stand and management area
                         // and if it has not been looked at
                         if (SiteVars.Stand[neighborSite] == SiteVars.Stand[crntSite]
                         && SiteVars.ManagementArea[neighborSite] == SiteVars.ManagementArea[crntSite]
                         && !sitesConsidered.Contains(neighborSite)
-                        && !sitesToConsider.Contains(neighborSite)) 
+                        && !sitesToConsider.Contains(neighborSite))
                         {
 
-                             sitesToConsider.Enqueue(neighborSite);
+                            sitesToConsider.Enqueue(neighborSite);
 
-                        } 
-                    } 
-                } 
+                        }
+                    }
+                }
 
-            } 
+            }
 
             return rtrnVal;
 
-        } 
+        }
 
 
         //---------------------------------------------------------------------
 
-        IEnumerator IEnumerable.GetEnumerator() {
+        IEnumerator IEnumerable.GetEnumerator()
+        {
             return ((IEnumerable<ActiveSite>)this).GetEnumerator();
         } // IEnumerator IEnumerable.GetEnumerator() {
 
