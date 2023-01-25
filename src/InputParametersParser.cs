@@ -243,7 +243,7 @@ namespace Landis.Library.HarvestManagement
                 ICohortSelector cohortSelector = ReadCohortSelector(false);
                 ICohortCutter cohortCutter = CreateCohortCutter(cohortSelector);
 
-                Planting.SpeciesList speciesToPlant = ReadSpeciesToPlant();
+                Planting.SpeciesList speciesToPlant = ReadDensitySpeciesToPlant();
 
                 //  Repeat harvest?
                 int repeatParamLineNumber = LineNumber;
@@ -254,7 +254,7 @@ namespace Landis.Library.HarvestManagement
                                                           harvestTimestep);
                     ICohortSelector additionalCohortSelector = ReadCohortSelector(true);
                     ICohortCutter additionalCohortCutter = CreateAdditionalCohortCutter(additionalCohortSelector);
-                    Planting.SpeciesList additionalSpeciesToPlant = ReadSpeciesToPlant();
+                    Planting.SpeciesList additionalSpeciesToPlant = ReadDensitySpeciesToPlant();
                     prescriptions.Add(new SingleRepeatHarvest(name,
                                                               rankingMethod,
                                                               siteSelector,
